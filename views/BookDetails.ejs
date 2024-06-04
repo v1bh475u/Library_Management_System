@@ -1,4 +1,54 @@
-<!-- Book Details -->
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #333;
+  }
+
+  h1,
+  h2 {
+    text-align: center;
+    margin-top: 2rem;
+  }
+
+  p {
+    text-align: center;
+  }
+
+  button {
+    display: block;
+    margin: 0 auto;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border-width: 0;
+  }
+
+  button:hover {
+    background-color: #ddd;
+    cursor: pointer;
+  }
+
+  #history {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2rem;
+    height: 10rem;
+  }
+
+  #history div {
+    border: .1rem solid #ddd;
+    padding: .5rem;
+    margin: .5rem;
+    width: 50%;
+  }
+
+  #history div p {
+    margin: 0;
+  }
+</style>
 <h1>
   <%= book.title %>
 </h1>
@@ -30,9 +80,9 @@
 
 
 <h2>Borrowing History</h2>
-<ul>
+<div id="history">
   <% history.forEach(function(history) { %>
-  <li>
+  <div>
     <p>Borrowed by <%= history.borrower %>
     </p>
     <p>Borrowed on <%= history.borrowed_date %></p>
@@ -40,11 +90,10 @@
     <p>Returned on <%= history.returned_date %>
     </p>
     <% } %>
-  </li>
+  </div>
   <% }); %>
-</ul>
-
-
+</div>
+<button onclick="window.location.href='/books'">Back to Catalog</button>
 <script>
   function checkoutBook(bookId, title) {
     let date = new Date();
