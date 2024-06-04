@@ -18,11 +18,11 @@
 
 
 <% if (book.status==='available') { %>
-<button onclick="checkoutBook('<%= book.id %>')">Checkout</button>
+<button onclick="checkoutBook('<%= book.id %>','<%=book.title%>')">Checkout</button>
 <% } else { %>
 <% if (book.borrower === user.username) { %>
-<button onclick="checkinBook('<%= book.id %>')">Checkin</button>
-<% } else{ %>
+<button onclick="checkinBook('<%= book.id %>','<%=book.title%>')">Checkin</button>
+<% } else if(book.status==='checkedout'){ %>
 <p>Borrowed by <%= book.borrower %>
 </p>
 <% }%>
@@ -31,22 +31,23 @@
 
 <h2>Borrowing History</h2>
 <ul>
-  <%/*%> <% book.borrowingHistory.forEach(function(history) { %>
+  <% history.forEach(function(history) { %>
   <li>
     <p>Borrowed by <%= history.borrower %>
     </p>
-    <p>Borrowed on <%= history.borrowedOn %></p>
-    <% if (history.returnedOn) { %>
-    <p>Returned on <%= history.returnedOn %>
+    <p>Borrowed on <%= history.borrowed_date %></p>
+    <% if (history.returned_date) { %>
+    <p>Returned on <%= history.returned_date %>
     </p>
     <% } %>
   </li>
-  <% }); %><%*/%>
+  <% }); %>
 </ul>
 
 
 <script>
-  function checkoutBook(bookId) {
+  function checkoutBook(bookId, title) {
+    let date = new Date();
     fetch('/checkout', {
       method: 'POST',
       headers: {
@@ -54,13 +55,17 @@
       },
       body: JSON.stringify({
         bookId: bookId,
-        borrower: '<%=user.username%>'
+        borrower: '<%=user.username%>',
+        title: title,
+        date: date.toISOString().slice(0, 19).replace('T', ' ')
       })
     })
+
     window.location.href = `/books`;
   }
 
-  function checkinBook(bookId) {
+  function checkinBook(bookId, title) {
+    let date = new Date();
     fetch('/checkin', {
       method: 'POST',
       headers: {
@@ -68,9 +73,12 @@
       },
       body: JSON.stringify({
         bookId: bookId,
-        borrower: '<%= user.username %>'
+        borrower: '<%= user.username %>',
+        title: title,
+        date: date.toISOString().slice(0, 19).replace('T', ' ')
       })
     })
+
     window.location.href = `/books`;
   }
 </script>
