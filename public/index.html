@@ -1,33 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login and Signup</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>Library Management System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #111;
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 80vh;
+    }
+
+    .hero {
+      background-color: #333;
+      padding: 40px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero h2 {
+      margin-top: 0;
+    }
+
+    .btn {
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #3e8e41;
+    }
+
+    #login-btn {
+      margin-right: 20px;
+    }
+
+    footer {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+      clear: both;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="container">
-    <div class="form-container">
-      <form id="loginForm">
-        <h2>Login</h2>
-        <div class="input-group">
-          <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" required>
-        </div>
-        <div class="input-group">
-          <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" required>
-        </div>
-        <button type="submit">Login</button>
-        <p class="message">Not registered? <a href="/register" id="showSignup">Create an account</a></p>
-      </form>
-    </div>
+  <header>
+    <h1>Library Management System</h1>
+  </header>
+  <main>
+    <section class="hero">
+      <h2>Welcome to our Library!</h2>
+      <p>Explore our vast collection of books, articles, and resources.</p>
+      <button class="btn" id="login-btn">Login</button>
+      <button class="btn" id="register-btn">Register</button>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2024 Library Management System </p>
+  </footer>
 
-  </div>
+  <script>
+    document.getElementById("login-btn").addEventListener("click", function() {
+      window.location.href = "/login";
+    });
 
+    document.getElementById("register-btn").addEventListener("click", function() {
+      window.location.href = "/register";
+    });
+  </script>
 </body>
 
 </html>

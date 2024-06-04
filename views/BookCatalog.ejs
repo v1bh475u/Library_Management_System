@@ -1,25 +1,148 @@
+<style>
+  body {
+    background-image: linear-gradient(to bottom right, #380036, #0CBABA);
+    /* dark theme */
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    text-decoration: none;
+    color: #fff;
+  }
+
+  nav {
+    background-color: #333;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    height: auto;
+    overflow: hidden;
+    z-index: 1;
+    padding-top: 1rem;
+    padding: auto;
+  }
+
+  nav ul {
+    list-style-type: none;
+    margin: 0 1rem;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  nav ul li {
+    margin: 0 .5rem;
+  }
+
+  nav ul li a:hover {
+    /* background-color: #fff; */
+    color: #333;
+  }
+
+  nav form {
+    display: flex;
+    align-items: center;
+  }
+
+  nav form input[type="text"] {
+    margin: 0 .5rem;
+    padding: .5rem;
+    border: none;
+    border-radius: .5rem;
+    background-color: #444;
+    color: #fff;
+  }
+
+  nav form button[type="submit"] {
+    background-color: #555;
+    color: #fff;
+    border: none;
+    padding: 0.5rem;
+    border-radius: .5rem;
+    cursor: pointer;
+  }
+
+  nav form button[type="submit"]:hover {
+    background-color: #666;
+  }
+
+  nav form select {
+    margin: 0 .5rem;
+    padding: .5rem;
+    border: none;
+    border-radius: .5rem;
+    background-color: #444;
+    color: #fff;
+  }
+
+  #books {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    margin: 0rem 0rem 17rem;
+  }
+
+  .book {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1%, solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(1rem);
+    -webkit-backdrop-filter: blur(1rem);
+    width: 50%;
+    height: fit-content;
+    padding: 1rem;
+    border-radius: 1rem;
+    color: #BEBEBE;
+    margin: 1rem;
+  }
+
+  .book h2,
+  .book p {
+    margin: 0 0 10px 0;
+    color: #fff;
+  }
+
+  .book button {
+    background-color: #555;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: .5rem;
+    cursor: pointer;
+  }
+
+  .book button:hover {
+    background-color: #666;
+  }
+</style>
 <header>
   <nav>
     <ul>
-      <li><a href="/books">Book Catalog</a></li>
+      <!-- <li><a href="/books">Book Catalog</a></li> -->
       <% if (user.role==='admin') { %>
       <li><a href="/requests">View Requests</a></li>
       <li><a href="/add_book">Add New Book</a></li>
       <% } else{%>
       <li><button onclick="reqAdmin('<%=user.username%>')">GetAdminPrivs</button></li>
       <% } %>
-      <li><button onclick="window.location.href='/login'">Logout(Not really)</button></li>
+      <li><a href='/login'>Logout(Not really)</a></li>
       <li><a href="/history">Borrowing History</a></li>
       <li>
-        <form action="/books/search" method="post">
+        <form action="/books/search" method="post" id="search-bar">
           <input type="text" name="query" placeholder="Search for books">
           <button type="submit">Search</button>
         </form>
       </li>
       <li>
-        <form action="/books" method="post">
+        <form action="/books" method="post" id="filter">
           <label>Filter by:</label>
-          <select name="genre">
+          <select name="genre" id="genre-select">
             <option value="">All Genres</option>
             <% genres.forEach(function(genre) { %>
             <option value="<%= genre %>">
@@ -27,7 +150,7 @@
             </option>
             <% }); %>
           </select>
-          <select name="author">
+          <select name="author" id="author-select">
             <option value="">All Authors</option>
             <% authors.forEach(function(author) { %>
             <option value="<%= author %>">
@@ -44,9 +167,9 @@
 </header>
 
 <h1>Book Catalog</h1>
-<ul>
+<div id="books">
   <% books.forEach(function(book) { %>
-  <li>
+  <div class="book">
     <h2>
       <%= book.title %>
     </h2>
@@ -55,20 +178,20 @@
     <p>Genre: <%= book.genre %>
     </p>
     <% if (book.status==='available') { %>
-    <button onclick="checkoutBook('<%= book.id %>','<%=book.title%>')">Checkout</button>
+    <button onclick="checkoutBook('<%= book.id %>','<%=book.title%>')" class="checkout">Checkout</button>
     <% } else if(book.status==='checkedout') { %>
     <p>Borrowed by <% if(user.username!==book.borrower) {%><%= book.borrower %><% }else{ %>you<% } %>
     </p>
     <% if(book.borrower===user.username){%>
-    <button onclick="checkinBook('<%= book.id %>','<%=book.title%>')">Checkin</button>
+    <button onclick="checkinBook('<%= book.id %>','<%=book.title%>')" class="checkin">Checkin</button>
     <% } %>
     <% } else{%>
     <p>Unavailable</p>
     <% } %>
     <button onclick=" viewBookDetails('<%= book.id %>')">View Details</button>
-  </li>
+  </div>
   <% }); %>
-</ul>
+</div>
 
 <script>
   function checkoutBook(bookId, title) {

@@ -254,8 +254,14 @@ app.post('/apply-changes', async (req, res) => {
         if (req.body.requests[key] === 'approved') {
             await requestExe(request[0]);
         } else if (req.body.requests[key] === 'disapproved') {
-            const query = `UPDATE books SET status = 'available' WHERE id = ${mysql.escape(request[0].book_id)}`;
-            await runDBCommand(query);
+            if (request[0].request === 'checkout') {
+                const query = `UPDATE books SET status = 'available' WHERE id = ${mysql.escape(request[0].book_id)}`;
+                await runDBCommand(query);
+            } else {
+                const query = `UPDATE books SET status = 'checkedout' WHERE id = ${mysql.escape(request[0].book_id)}`;
+                await runDBCommand(query);
+
+            }
         }
     }
     res.redirect('/requests');
