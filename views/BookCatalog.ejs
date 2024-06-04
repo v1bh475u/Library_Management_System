@@ -1,0 +1,119 @@
+<header>
+  <nav>
+    <ul>
+      <li><a href="/books">Book Catalog</a></li>
+      <% if (user.role==='admin') { %>
+      <li><a href="/requests">View Requests</a></li>
+      <li><a href="/add_book">Add New Book</a></li>
+      <% } else{%>
+      <li><button onclick="reqAdmin('<%=user.username%>')">GetAdminPrivs</button></li>
+      <% } %>
+      <li><button onclick="window.location.href='/login'">Logout(Not really)</button></li>
+      <li>
+        <form action="/books/search" method="post">
+          <input type="text" name="query" placeholder="Search for books">
+          <button type="submit">Search</button>
+        </form>
+      </li>
+      <li>
+        <form action="/books" method="post">
+          <label>Filter by:</label>
+          <select name="genre">
+            <option value="">All Genres</option>
+            <% genres.forEach(function(genre) { %>
+            <option value="<%= genre %>">
+              <%= genre %>
+            </option>
+            <% }); %>
+          </select>
+          <select name="author">
+            <option value="">All Authors</option>
+            <% authors.forEach(function(author) { %>
+            <option value="<%= author %>">
+              <%= author %>
+            </option>
+            <% }); %>
+          </select>
+          <button type="submit">Filter</button>
+        </form>
+
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<h1>Book Catalog</h1>
+<ul>
+  <% books.forEach(function(book) { %>
+  <li>
+    <h2>
+      <%= book.title %>
+    </h2>
+    <p>Author: <%= book.author %>
+    </p>
+    <p>Genre: <%= book.genre %>
+    </p>
+    <% if (book.status==='available') { %>
+    <button onclick="checkoutBook('<%= book.id %>')">Checkout</button>
+    <% } else if(book.status==='checkedout') { %>
+    <p>Borrowed by <% if(user.username!==book.borrower) {%><%= book.borrower %><% }else{ %>you<% } %>
+    </p>
+    <% if(book.borrower===user.username){%>
+    <button onclick="checkinBook('<%= book.id %>')">Checkin</button>
+    <% } %>
+    <% } else{%>
+    <p>Unavailable</p>
+    <% } %>
+    <button onclick="viewBookDetails('<%= book.id %>')">View Details</button>
+  </li>
+  <% }); %>
+</ul>
+
+<script>
+  function checkoutBook(bookId) {
+    fetch('/checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        bookId: bookId,
+        borrower: '<%=user.username%>'
+      })
+    })
+    window.location.href = '/books';
+  }
+
+  function checkinBook(bookId) {
+    fetch('/checkin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        bookId: bookId,
+        borrower: '<%= user.username %>'
+      })
+    })
+    window.location.href = '/books';
+  }
+
+  function viewBookDetails(bookId) {
+    window.location.href = `/books/${bookId}`;
+  }
+
+  function reqAdmin(username) {
+    fetch('/reqAdmin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username
+        })
+      })
+      .then(response => response.json())
+      .then(data => console.log(data))
+      .catch(error => console.error(error));
+  }
+</script>

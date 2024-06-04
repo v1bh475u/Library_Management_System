@@ -1,0 +1,118 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SignUp</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .form-container {
+      padding: 3rem 6rem;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      width: auto;
+      max-width: 100%;
+      overflow: hidden;
+      position: relative;
+      margin: 1rem;
+    }
+
+    form {
+      width: auto;
+    }
+
+    form.active {
+      display: block;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      margin-bottom: 5px;
+      display: block;
+      color: #666;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 16px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #5cb85c;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4cae4c;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+    }
+
+    .message a {
+      color: #5cb85c;
+      text-decoration: none;
+    }
+
+    .message a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="form-container">
+
+    <form id="Register" action="/register" method="post">
+      <h2>Register</h2>
+      <div class="input-group">
+        <input type="text" id="signupUsername" name="username" required placeholder="username">
+      </div>
+      <div class="input-group">
+        <input type="password" id="signupPassword" name="password" required placeholder="Password">
+      </div>
+      <button type="submit">Register</button>
+      <p class="message">Already registered? <a href="#" id="showLogin">Sign in</a></p>
+    </form>
+  </div>
+</body>
+
+</html>

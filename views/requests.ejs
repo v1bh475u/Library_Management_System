@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Requests</title>
+  <style>
+    /* Global styles */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Table styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px auto;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f0f0f0;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    /* Select dropdown styles */
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    /* Button styles */
+    button {
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #3e8e41;
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* Apply changes button styles */
+    #apply-changes {
+      background-color: #8bc34a;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #apply-changes:hover {
+      background-color: #689f38;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Pending Requests</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Requester</th>
+        <th>Book ID</th>
+        <th>Request Details</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% requests.forEach(function(request) { %>
+      <% if (request.status==='pending' ) { %>
+      <tr>
+        <td>
+          <%= request.id %>
+        </td>
+        <td>
+          <%= request.username %>
+        </td>
+        <td>
+          <%= request.book_id %>
+        </td>
+        <td>
+          <%= request.request %>
+        </td>
+        <td>
+          <select name="<%= request.id %>" class="status">
+            <option value="pending" selected>Pending</option>
+            <option value="approved">Approved</option>
+            <option value="disapproved">Disapproved</option>
+          </select>
+        </td>
+      </tr>
+      <% }}); %>
+    </tbody>
+  </table>
+
+  <button id="apply-changes">Apply Changes</button>
+  <button onclick="window.location.href='/books'">Back</button>
+</body>
+<script>
+  let requests = {};
+  document.getElementById('apply-changes').addEventListener('click', function() {
+    let status = document.querySelectorAll('.status');
+    status.forEach(function(select) {
+      const requestId = select.name;
+      const newStatus = select.value;
+      requests[requestId] = newStatus;
+    });
+    fetch('/apply-changes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        requests
+      })
+    })
+    window.location.href = '/requests';
+  });
+</script>
+
+</html>
