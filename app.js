@@ -70,9 +70,13 @@ async function requestExe(request) {
         case 'checkout':
             query = `UPDATE books SET status = 'checkedout', borrower=${mysql.escape(request.username)} WHERE id = ${mysql.escape(request.book_id)}`;
             await runDBCommand(query);
+            query = `INSERT INTO borrowing_history (book_id,title,borrower,borrowed_date) VALUES(${mysql.escape(request.book_id)},${mysql.escape(request.title)},${mysql.escape(request.username)},${mysql.escape(request.date)})`;
+            await runDBCommand(query);
             break;
         case 'checkin':
             query = `UPDATE books SET status = 'available', borrower=null WHERE id = ${mysql.escape(request.book_id)}`;
+            await runDBCommand(query);
+            query = `UPDATE borrowing_history SET returned_date=${mysql.escape(request.date)} WHERE book_id=${mysql.escape(request.book_id)} AND borrower=${mysql.escape(request.username)} AND returned_date IS NULL`;
             await runDBCommand(query);
             break;
         case 'admin':
@@ -191,13 +195,16 @@ app.get('/books/:id', authenticateUser, async (req, res) => {
     const result = await runDBCommand(query);
     const token = req.headers.cookie.split('token=')[1];
     const user = await getUser(token);
-    res.render('BookDetails', { book: result[0], user: user });
+    const history = await runDBCommand(`SELECT * FROM borrowing_history WHERE book_id=${mysql.escape(req.params.id)}`);
+    res.render('BookDetails', { book: result[0], user: user, history: history });
 });
 
 app.post('/checkout', async (req, res) => {
     const bookid = req.body.bookId;
     const borrower = req.body.borrower;
-    let query = `INSERT INTO requests (username,book_id,request,status) VALUES(${mysql.escape(borrower)},${mysql.escape(bookid)},'checkout','pending')`;
+    const title = req.body.title;
+    const date = req.body.date;
+    let query = `INSERT INTO requests (username,book_id,title,request,status,date) VALUES(${mysql.escape(borrower)},${mysql.escape(bookid)},${mysql.escape(title)},'checkout','pending',${mysql.escape(date)})`;
     await runDBCommand(query);
     query = `UPDATE books SET status = 'Unavailable' WHERE id = ${mysql.escape(bookid)}`;
     await runDBCommand(query);
@@ -208,7 +215,9 @@ app.post('/checkout', async (req, res) => {
 app.post('/checkin', async (req, res) => {
     const bookid = req.body.bookId;
     const borrower = req.body.borrower;
-    let query = `INSERT INTO requests (username,book_id,request,status) VALUES(${mysql.escape(borrower)},${mysql.escape(bookid)},'checkin','pending')`;
+    const title = req.body.title;
+    const date = req.body.date;
+    let query = `INSERT INTO requests (username,book_id,title,request,status,date) VALUES(${mysql.escape(borrower)},${mysql.escape(bookid)},${mysql.escape(title)},'checkin','pending',${mysql.escape(date)})`;
     await runDBCommand(query);
     query = `UPDATE books SET status = 'Unavailable' WHERE id = ${mysql.escape(bookid)}`;
     await runDBCommand(query);
@@ -222,6 +231,15 @@ app.post('/reqAdmin', authenticateUser, async (req, res) => {
     await runDBCommand(query);
     console.log("Request Sent");
 });
+
+app.get('/history', authenticateUser, async (req, res) => {
+    const token = req.headers.cookie.split('token=')[1];
+    const user = await getUser(token);
+    const query = `SELECT * FROM borrowing_history WHERE borrower = ${mysql.escape(user.username)}`;
+    const result = await runDBCommand(query);
+    res.render('BorrowingHistory', { borrowingHistory: result });
+});
+
 app.get('/requests', authenticateUser, async (req, res) => {
     const query = `SELECT * FROM requests`;
     const result = await runDBCommand(query);
@@ -229,14 +247,15 @@ app.get('/requests', authenticateUser, async (req, res) => {
 });
 
 app.post('/apply-changes', async (req, res) => {
-    // console.log(req.body);
     for (let key in req.body.requests) {
-        // console.log(key, req.body.requests[key]);
         const query = `UPDATE requests SET status = ${mysql.escape(req.body.requests[key])} WHERE id = ${mysql.escape(key)}`;
         await runDBCommand(query);
+        const request = await runDBCommand(`SELECT * FROM requests WHERE id = ${key}`);
         if (req.body.requests[key] === 'approved') {
-            const request = await runDBCommand(`SELECT * FROM requests WHERE id = ${key}`);
             await requestExe(request[0]);
+        } else if (req.body.requests[key] === 'disapproved') {
+            const query = `UPDATE books SET status = 'available' WHERE id = ${mysql.escape(request[0].book_id)}`;
+            await runDBCommand(query);
         }
     }
     res.redirect('/requests');

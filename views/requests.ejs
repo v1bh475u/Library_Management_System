@@ -91,6 +91,7 @@
         <th>ID</th>
         <th>Requester</th>
         <th>Book ID</th>
+        <th>Book Title</th>
         <th>Request Details</th>
         <th>Status</th>
       </tr>
@@ -108,6 +109,7 @@
         <td>
           <%= request.book_id %>
         </td>
+        <td><%=request.title%></td>
         <td>
           <%= request.request %>
         </td>
@@ -144,6 +146,7 @@
         requests
       })
     })
+
     window.location.href = '/requests';
   });
 </script>
