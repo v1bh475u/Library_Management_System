@@ -1,16 +1,23 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-
+const secretkey = process.env.SECRET_KEY;
 const HashPassword = async (password) => {
     const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(password, salt);
 };
 
 const authenticateUser = (req, res, next) => {
-    if (jwt.verify(req.headers.cookie.split('token=')[1], secretkey)) {
-        next();
-    } else {
-        res.status(401).send("Unauthorized");
+    try {
+        const token = req.headers.cookie.split('token=')[1];
+
+        if (jwt.verify(token, secretkey)) {
+            next();
+        } else {
+            res.render("error", { message: "Unauthorized" });
+        }
+    }
+    catch (err) {
+        res.render("error", { message: "Unauthorized" });
     }
 };
 

@@ -79,14 +79,14 @@
   }
 
   #books {
-    display: flex;
+    display: flexbox;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    width: 90%;
     height: auto;
     padding: 0;
-    margin: 0rem 0rem 17rem;
+    margin: auto;
   }
 
   .book {
@@ -94,7 +94,7 @@
     border: 1%, solid rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(1rem);
     -webkit-backdrop-filter: blur(1rem);
-    width: 50%;
+    width: 80%;
     height: fit-content;
     padding: 1rem;
     border-radius: 1rem;
@@ -131,9 +131,9 @@
       <% } else{%>
       <li><button onclick="reqAdmin('<%=user.username%>')">GetAdminPrivs</button></li>
       <% } %>
-      <li><a href='/login'>Logout(Not really)</a></li>
+      <li><a href='/logout'>Logout</a></li>
       <li><a href="/history">Borrowing History</a></li>
-      <li><a href="/messages">Messages</a></li>
+      <li><a href="/messages" id="messages">Messages</a></li>
       <li>
         <form action="/books/search" method="post" id="search-bar">
           <input type="text" name="query" placeholder="Search for books">
@@ -166,7 +166,14 @@
     </ul>
   </nav>
 </header>
-
+<% if(n_messages>0){ %>
+<script>
+  var n_messages = <%= n_messages %>;
+  alert('You have ' + String(n_messages) + ' new messages');
+  var messagelink = document.getElementById('messages');
+  messagelink.style.color = 'red';
+</script>
+<% } %>
 <h1>Book Catalog</h1>
 <div id="books">
   <% books.forEach(function(book) { %>
@@ -194,18 +201,17 @@
   }
 
   function reqAdmin(username) {
+    let date = new Date();
     fetch('/reqAdmin', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        username: username
+        username: username,
+        date: date.toISOString().slice(0, 19).replace('T', ' ')
       })
     })
     window.location.href = `/books`;
-  }
-  if (n_message > 0) {
-    alert('You have' + String(n_message) + 'new messages');
   }
 </script>

@@ -84,13 +84,17 @@ app.post('/register', validateRequestBody, async (req, res) => {
     res.redirect('/login');
 });
 
+app.get('/logout', authenticateUser, (req, res) => {
+    res.clearCookie('token');
+    res.redirect('/');
+});
 app.get('/books', authenticateUser, async (req, res) => {
     const query = `SELECT * FROM books`;
     const result = await runDBCommand(query);
     const token = req.headers.cookie.split('token=')[1];
     const user = await getUser(token);
-    const n_messages = checkers.messageChecker(user).length;
-    res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors, n_messages: n_messages });
+    const n_messages = await checkers.messageChecker(user);
+    res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors, n_messages: n_messages.length });
 });
 
 app.post('/books', authenticateUser, async (req, res) => {
@@ -145,7 +149,7 @@ app.post('/checkout', authenticateUser, checkers.checkout_check, async (req, res
     const borrower = req.body.borrower;
     const title = req.body.title;
     const date = req.body.date;
-    let query = `INSERT INTO requests (username,book_id,title,request,status,date) VALUES(${mysql.escape(borrower)},${mysql.escape(bookid)},${mysql.escape(title)},'checkout','pending',${mysql.escape(date)})`;
+    let query = `INSERT INTO requests (username,book_id,title,request,status,date,user_status) VALUES(${mysql.escape(borrower)},${mysql.escape(bookid)},${mysql.escape(title)},'checkout','pending',${mysql.escape(date)},'pending')`;
     await runDBCommand(query);
     console.log("Request Sent");
     res.redirect('/books');
@@ -157,7 +161,7 @@ app.post('/checkin', authenticateUser, checkers.checkin_check, async (req, res) 
     const borrower = req.body.borrower;
     const title = req.body.title;
     const date = req.body.date;
-    let query = `INSERT INTO requests (username,book_id,title,request,status,date) VALUES(${mysql.escape(borrower)},${mysql.escape(bookid)},${mysql.escape(title)},'checkin','pending',${mysql.escape(date)})`;
+    let query = `INSERT INTO requests (username,book_id,title,request,status,date,user_status) VALUES(${mysql.escape(borrower)},${mysql.escape(bookid)},${mysql.escape(title)},'checkin','pending',${mysql.escape(date)},'pending')`;
     await runDBCommand(query);
     console.log("Request Sent");
     res.redirect('/books');
@@ -166,11 +170,12 @@ app.post('/checkin', authenticateUser, checkers.checkin_check, async (req, res) 
 
 app.post('/reqAdmin', authenticateUser, async (req, res) => {
     const username = req.body.username;
+    const date = req.body.date;
     if (!checkers.nameChecker(username)) {
         res.status(400).send("User Not Found 😛");
         return;
     }
-    const query = `INSERT INTO requests (username,request,status) VALUES(${mysql.escape(username)},'admin','pending')`;
+    const query = `INSERT INTO requests (username,request,status,user_status,date) VALUES(${mysql.escape(username)},'adminPrivs','pending','pending',${mysql.escape(date)})`;
     await runDBCommand(query);
     console.log("Request Sent");
 });
@@ -199,6 +204,7 @@ app.get('/messages', authenticateUser, async (req, res) => {
     }
     res.render('messages', { messages: result });
 });
+
 app.post('/apply-changes', isAdmin, async (req, res) => {
     console.log(req.body);
     for (let key in req.body.requests) {
@@ -212,7 +218,7 @@ app.post('/apply-changes', isAdmin, async (req, res) => {
         }
         let query = `UPDATE requests SET status = ${mysql.escape(req.body.requests[key])} WHERE id = ${mysql.escape(key)}`;
         if (req.body.requests[key] !== 'pending') {
-            query = `UPDATE requests SET status = ${mysql.escape(req.body.requests[key])}, user_status='seen' WHERE id = ${mysql.escape(key)}`;
+            query = `UPDATE requests SET status = ${mysql.escape(req.body.requests[key])}, user_status='unseen' WHERE id = ${mysql.escape(key)}`;
         }
         await runDBCommand(query);
         const request = await runDBCommand(`SELECT * FROM requests WHERE id = ${key}`);

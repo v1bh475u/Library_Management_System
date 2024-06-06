@@ -1,6 +1,47 @@
+<style>
+  #messages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .message {
+    margin: 1rem;
+    padding: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+  }
+
+  button {
+    margin: auto;
+    padding: 1rem 2rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
+<% if(messages.length===0){ %>
+<h1>No messages</h1>
+<% } else { %>
 <div id="messages"><%messages.forEach(function(message) { %>
   <div class="message">
-    <p>Your request for <%= message.request %> has been <%= message.status %>!</p>
+    <% if(message.request=='adminPrivs') {%>
+    <p>Your request for admin Privileges has been <%=message.status%>!</p>
+    <% } else { %>
+    <p>Your request for <%= message.request %> of <%=message.title%> has been <%= message.status %>!</p>
+    <% } %>
   </div>
   <% }); %>
 </div>
+<% } %>
+<button onclick="window.location.href='/books'">Back to Catalog</button>

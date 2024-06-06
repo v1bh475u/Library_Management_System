@@ -23,8 +23,8 @@ CREATE TABLE `requests`(
     `book_id` INT,
     FOREIGN KEY(`book_id`) REFERENCES books(id),
     `title` VARCHAR(255) NULL,
-    `request` ENUM('pending','approved','disapproved') NOT NULL,
-    `status` VARCHAR(255) NOT NULL,
+    `request` ENUM('checkout','checkin','adminPrivs') NOT NULL,
+    `status` ENUM('pending','approved','disapproved') NOT NULL,
     `user_status` ENUM('seen','unseen','pending') NOT NULL,
     `date` DATE NOT NULL
 );

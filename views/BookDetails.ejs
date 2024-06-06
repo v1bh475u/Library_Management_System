@@ -68,11 +68,11 @@
 </p> -->
 
 
-<% if (book.status==='available'&&isBorrower.length===0) { %>
-<button onclick="checkoutBook('<%= book.id %>','<%=book.title%>')">Checkout</button>
+<% if (book.status==='available'&&!isBorrower) { %>
+<button onclick="checkoutBook(`<%= book.id %>`,`<%=book.title%>`)">Checkout</button>
 <% } else { %>
-<% if (isBorrower.length>0) { %>
-<button onclick="checkinBook('<%= book.id %>','<%=book.title%>')">Checkin</button>
+<% if (isBorrower) { %>
+<button onclick="checkinBook(`<%= book.id %>`,`<%=book.title%>`)">Checkin</button>
 <% }%>
 <% } %>
 
