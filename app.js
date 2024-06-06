@@ -143,7 +143,7 @@ app.get('/books/:id', authenticateUser, async (req, res) => {
     res.render('BookDetails', { book: result[0], user: user, history: history, isBorrower: isBorrower });
 });
 
-app.post('/checkout', authenticateUser, checkers.checkout_check, async (req, res) => {
+app.post('/checkout', authenticateUser, checkers.checkout_check, checkers.isAdminRequested, async (req, res) => {
     const bookid = req.body.bookId;
     const borrower = req.body.borrower;
     const title = req.body.title;
@@ -155,7 +155,7 @@ app.post('/checkout', authenticateUser, checkers.checkout_check, async (req, res
 
 });
 
-app.post('/checkin', authenticateUser, checkers.checkin_check, async (req, res) => {
+app.post('/checkin', authenticateUser, checkers.checkin_check, checkers.isAdminRequested, async (req, res) => {
     const bookid = req.body.bookId;
     const borrower = req.body.borrower;
     const title = req.body.title;
@@ -167,7 +167,7 @@ app.post('/checkin', authenticateUser, checkers.checkin_check, async (req, res) 
 
 });
 
-app.post('/reqAdmin', authenticateUser, async (req, res) => {
+app.post('/reqAdmin', authenticateUser, checkers.isAdminRequested, async (req, res) => {
     const username = req.body.username;
     const date = req.body.date;
     if (!checkers.nameChecker(username)) {
@@ -177,6 +177,7 @@ app.post('/reqAdmin', authenticateUser, async (req, res) => {
     const query = `INSERT INTO requests (username,request,status,user_status,date) VALUES(${mysql.escape(username)},'adminPrivs','pending','pending',${mysql.escape(date)})`;
     await runDBCommand(query);
     console.log("Request Sent");
+    res.render('error', { message: 'Request Sent', error: 'Request Sent' });
 });
 
 app.get('/history', authenticateUser, async (req, res) => {
@@ -236,14 +237,6 @@ app.post('/apply-changes', isAdmin, async (req, res) => {
         const request = await runDBCommand(`SELECT * FROM requests WHERE id = ${key}`);
         if (req.body.requests[key] === 'approved') {
             await requestExe(request[0]);
-        } else if (req.body.requests[key] === 'disapproved') {
-            if (request[0].request === 'checkout') {
-                const query = `UPDATE books SET status = 'available' WHERE id = ${mysql.escape(request[0].book_id)}`;
-                await runDBCommand(query);
-            } else {
-                const query = `UPDATE books SET status = 'checkedout' WHERE id = ${mysql.escape(request[0].book_id)}`;
-                await runDBCommand(query);
-            }
         }
     }
     res.redirect('/requests');

@@ -4,9 +4,10 @@ CREATE TABLE `users`(
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `username` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
-    `role` VARCHAR(255) NOT NULL,
+    `role` ENUM('user','admin') NOT NULL,
     `messages` INT
 );
+INSERT INTO `users`(`username`,`password`,`role`) VALUES('admin','$2a$10$Y81FQMc4SJqo46ac/wVyk.gZfoCwLuR6/fvUkPS/9N.AXTvC2FhVm','admin');
 
 CREATE TABLE `books`(
     `id` INT AUTO_INCREMENT PRIMARY KEY,

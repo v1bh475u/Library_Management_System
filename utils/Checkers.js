@@ -62,16 +62,16 @@ const messageChecker = async (user) => {
 const BookChecker = async (req, res, next) => {
     const { title, author, genre, quantity } = req.body;
     if (!title) {
-        res.render('error', { message: 'Wrong Book', error: 'Title is not present!' });
+        return res.render('error', { message: 'Wrong Book', error: 'Title is not present!' });
     }
     else if (!author) {
-        res.render('error', { message: 'Wrong Book', error: 'Author is not present!' });
+        return res.render('error', { message: 'Wrong Book', error: 'Author is not present!' });
     }
     else if (!genre) {
-        res.render('error', { message: 'Wrong Book', error: 'Genre is not present!' });
+        return res.render('error', { message: 'Wrong Book', error: 'Genre is not present!' });
     }
     else if (quantity < 1) {
-        res.render('error', { message: 'Wrong Book', error: 'Quantity is not present!' });
+        return res.render('error', { message: 'Wrong Book', error: 'Quantity is not present!' });
     } else {
         next();
     }
@@ -83,10 +83,35 @@ const isBookPresent = async (req, res, next) => {
     const genre = req.body.genre.trim();
     const result = await runDBCommand(`SELECT * FROM books WHERE title=${mysql.escape(title)} AND author=${mysql.escape(author)} AND genre=${mysql.escape(genre)}`);
     if (result.length > 0) {
-        res.render('error', { message: 'Wrong Book', error: 'Book already present!' });
+        return res.render('error', { message: 'Wrong Book', error: 'Book already present!' });
     } else {
         next();
     }
 };
+const isAdminRequested = async (req, res, next) => {
+    const username = req.body.username;
+    const book_id = req.body.bookId;
+    const request = req.body.request;
+    console.log(request, username, book_id);
+    if (book_id === undefined) {
+        const result = await runDBCommand(`SELECT * FROM requests WHERE username=${mysql.escape(username)} AND status='pending' AND request=${mysql.escape('adminPrivs')}`);
+        console.log(result.length);
+        if (result.length > 0) {
+            console.log('here');
+            return res.render('error', { message: 'SPAM', error: 'Request already present!' });
+        } else {
+            next();
+        }
+    } else {
+        const result = await runDBCommand(`SELECT * FROM requests WHERE username=${mysql.escape(username)} AND book_id=${mysql.escape(book_id)} AND status='pending'`);
+        console.log(result);
+        if (result.length > 0) {
+            console.log('there');
+            return res.render('error', { message: 'SPAM', error: 'Request already present!' });
+        } else {
+            next();
+        }
+    }
+}
 
-module.exports = { statusChecker, idchecker, nameChecker, messageChecker, checkin_check, checkout_check, BookChecker, isBookPresent };
+module.exports = { statusChecker, idchecker, nameChecker, messageChecker, checkin_check, checkout_check, BookChecker, isBookPresent, isAdminRequested };

@@ -12,11 +12,11 @@ const authenticateUser = (req, res, next) => {
         if (jwt.verify(token, secretkey)) {
             next();
         } else {
-            res.render("error", { message: "Unauthorized", error: "I see forgery!" });
+            return res.render("error", { message: "Unauthorized", error: "I see forgery!" });
         }
     }
     catch (err) {
-        res.render("error", { message: "Unauthorized", error: "Where's your token?" });
+        return res.render("error", { message: "Unauthorized", error: "Where's your token?" });
     }
 };
 
@@ -25,10 +25,10 @@ const validateRequestBody = (req, res, next) => {
         if (req.body.password) {
             next();
         } else {
-            res.status(400).send("Make sure you have entered the password! 😏");
+            return res.status(400).send("Make sure you have entered the password! 😏");
         }
     } else {
-        res.status(400).send("Make sure you have entered the username! 😏");
+        return res.status(400).send("Make sure you have entered the username! 😏");
     }
 };
 
@@ -37,7 +37,7 @@ const isAdmin = async (req, res, next) => {
     if (jwt.decode(token, secretkey).role === 'admin') {
         next();
     } else {
-        res.status(401).send("How dare you try to access this page! 😡");
+        return res.status(401).send("How dare you try to access this page! 😡");
     }
 };
 
