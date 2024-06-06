@@ -1,217 +1,84 @@
-<style>
-  body {
-    background-image: linear-gradient(to bottom right, #380036, #0CBABA);
-    /* dark theme */
-    color: #fff;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
+<html lang="en">
 
-  a {
-    text-decoration: none;
-    color: #fff;
-  }
+<head>
+  <title>Book Catalog</title>
+  <link rel="stylesheet" type="text/css" href="/css/BookCatalog.css">
+</head>
 
-  nav {
-    background-color: #333;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    height: auto;
-    overflow: hidden;
-    z-index: 1;
-    padding-top: 1rem;
-    padding: auto;
-  }
+<body>
+  <header>
+    <nav>
+      <ul>
+        <% if (user.role==='admin') { %>
+        <li><a href="/requests">View Requests</a></li>
+        <li><a href="/add_book">Add New Book</a></li>
+        <% } else{%>
+        <li><button onclick="reqAdmin('<%=user.username%>')">GetAdminPrivs</button></li>
+        <% } %>
+        <li><a href='/logout'>Logout</a></li>
+        <li><a href="/history">Borrowing History</a></li>
+        <li><a href="/messages" id="messages">Messages</a></li>
+        <li>
+          <form action="/books/search" method="post" id="search-bar">
+            <input type="text" name="query" placeholder="Search for books">
+            <button type="submit">Search</button>
+          </form>
+        </li>
+        <li>
+          <form action="/books" method="post" id="filter">
+            <label>Filter by:</label>
+            <select name="genre" id="genre-select">
+              <option value="">All Genres</option>
+              <% genres.forEach(function(genre) { %>
+              <option value="<%= genre %>">
+                <%= genre %>
+              </option>
+              <% }); %>
+            </select>
+            <select name="author" id="author-select">
+              <option value="">All Authors</option>
+              <% authors.forEach(function(author) { %>
+              <option value="<%= author %>">
+                <%= author %>
+              </option>
+              <% }); %>
+            </select>
+            <button type="submit">Filter</button>
+          </form>
 
-  nav ul {
-    list-style-type: none;
-    margin: 0 1rem;
-    padding: 0;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  nav ul li {
-    margin: 0 .5rem;
-  }
-
-  nav ul li a:hover {
-    /* background-color: #fff; */
-    color: #333;
-  }
-
-  nav form {
-    display: flex;
-    align-items: center;
-  }
-
-  nav form input[type="text"] {
-    margin: 0 .5rem;
-    padding: .5rem;
-    border: none;
-    border-radius: .5rem;
-    background-color: #444;
-    color: #fff;
-  }
-
-  nav form button[type="submit"] {
-    background-color: #555;
-    color: #fff;
-    border: none;
-    padding: 0.5rem;
-    border-radius: .5rem;
-    cursor: pointer;
-  }
-
-  nav form button[type="submit"]:hover {
-    background-color: #666;
-  }
-
-  nav form select {
-    margin: 0 .5rem;
-    padding: .5rem;
-    border: none;
-    border-radius: .5rem;
-    background-color: #444;
-    color: #fff;
-  }
-
-  #books {
-    display: flexbox;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    width: 90%;
-    height: auto;
-    padding: 0;
-    margin: auto;
-  }
-
-  .book {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1%, solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(1rem);
-    -webkit-backdrop-filter: blur(1rem);
-    width: 80%;
-    height: fit-content;
-    padding: 1rem;
-    border-radius: 1rem;
-    color: #BEBEBE;
-    margin: 1rem;
-  }
-
-  .book h2,
-  .book p {
-    margin: 0 0 10px 0;
-    color: #fff;
-  }
-
-  .book button {
-    background-color: #555;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: .5rem;
-    cursor: pointer;
-  }
-
-  .book button:hover {
-    background-color: #666;
-  }
-</style>
-<header>
-  <nav>
-    <ul>
-      <!-- <li><a href="/books">Book Catalog</a></li> -->
-      <% if (user.role==='admin') { %>
-      <li><a href="/requests">View Requests</a></li>
-      <li><a href="/add_book">Add New Book</a></li>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <% if(n_messages>0){ %>
+  <script>
+    var n_messages = <%= n_messages %>;
+    alert('You have ' + String(n_messages) + ' new messages');
+    var messagelink = document.getElementById('messages');
+    messagelink.style.color = 'red';
+  </script>
+  <% } %>
+  <h1>Book Catalog</h1>
+  <div id="books">
+    <% books.forEach(function(book) { %>
+    <div class="book">
+      <h2>
+        <%= book.title %>
+      </h2>
+      <p>Author: <%= book.author %>
+      </p>
+      <p>Genre: <%= book.genre %>
+      </p>
+      <% if (book.status==='available') { %>
+      <p>Available</p>
       <% } else{%>
-      <li><button onclick="reqAdmin('<%=user.username%>')">GetAdminPrivs</button></li>
+      <p>Unavailable</p>
       <% } %>
-      <li><a href='/logout'>Logout</a></li>
-      <li><a href="/history">Borrowing History</a></li>
-      <li><a href="/messages" id="messages">Messages</a></li>
-      <li>
-        <form action="/books/search" method="post" id="search-bar">
-          <input type="text" name="query" placeholder="Search for books">
-          <button type="submit">Search</button>
-        </form>
-      </li>
-      <li>
-        <form action="/books" method="post" id="filter">
-          <label>Filter by:</label>
-          <select name="genre" id="genre-select">
-            <option value="">All Genres</option>
-            <% genres.forEach(function(genre) { %>
-            <option value="<%= genre %>">
-              <%= genre %>
-            </option>
-            <% }); %>
-          </select>
-          <select name="author" id="author-select">
-            <option value="">All Authors</option>
-            <% authors.forEach(function(author) { %>
-            <option value="<%= author %>">
-              <%= author %>
-            </option>
-            <% }); %>
-          </select>
-          <button type="submit">Filter</button>
-        </form>
-
-      </li>
-    </ul>
-  </nav>
-</header>
-<% if(n_messages>0){ %>
-<script>
-  var n_messages = <%= n_messages %>;
-  alert('You have ' + String(n_messages) + ' new messages');
-  var messagelink = document.getElementById('messages');
-  messagelink.style.color = 'red';
-</script>
-<% } %>
-<h1>Book Catalog</h1>
-<div id="books">
-  <% books.forEach(function(book) { %>
-  <div class="book">
-    <h2>
-      <%= book.title %>
-    </h2>
-    <p>Author: <%= book.author %>
-    </p>
-    <p>Genre: <%= book.genre %>
-    </p>
-    <% if (book.status==='available') { %>
-    <p>Available</p>
-    <% } else{%>
-    <p>Unavailable</p>
-    <% } %>
-    <button onclick=" viewBookDetails('<%= book.id %>')">View Details</button>
+      <button onclick=" viewBookDetails('<%= book.id %>')">View Details</button>
+    </div>
+    <% }); %>
   </div>
-  <% }); %>
-</div>
+</body>
+<script src="/js/BookCatalog.js"></script>
 
-<script>
-  function viewBookDetails(bookId) {
-    window.location.href = `/books/${bookId}`;
-  }
-
-  function reqAdmin(username) {
-    let date = new Date();
-    fetch('/reqAdmin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        username: username,
-        date: date.toISOString().slice(0, 19).replace('T', ' ')
-      })
-    })
-    window.location.href = `/books`;
-  }
-</script>
+</html>

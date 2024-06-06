@@ -9,15 +9,14 @@ const HashPassword = async (password) => {
 const authenticateUser = (req, res, next) => {
     try {
         const token = req.headers.cookie.split('token=')[1];
-
         if (jwt.verify(token, secretkey)) {
             next();
         } else {
-            res.render("error", { message: "Unauthorized" });
+            res.render("error", { message: "Unauthorized", error: "I see forgery!" });
         }
     }
     catch (err) {
-        res.render("error", { message: "Unauthorized" });
+        res.render("error", { message: "Unauthorized", error: "Where's your token?" });
     }
 };
 

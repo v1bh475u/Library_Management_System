@@ -1,93 +1,32 @@
-<style>
-  /* Dark mode theme */
+<head>
+  <title>Borrowing History</title>
+  <link rel="stylesheet" type="text/css" href="/css/History.css">
+</head>
 
-  body {
-    background-color: #2f2f2f;
-    /* Dark gray background */
-    color: #fff;
-    /* White text */
-    font-family: Arial, sans-serif;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px auto;
-    background-color: #333;
-    /* Darker gray background for table */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  }
-
-  th,
-  td {
-    padding: 10px;
-    border: 1px solid #444;
-    /* Dark gray border */
-    text-align: left;
-  }
-
-  th {
-    background-color: #444;
-    /* Dark gray header background */
-    color: #fff;
-    /* White header text */
-  }
-
-  td {
-    background-color: #333;
-    /* Darker gray row background */
-  }
-
-  tr:nth-child(even) {
-    background-color: #292929;
-    /* Alternate row background */
-  }
-
-  button {
-    background-color: #666;
-    /* Dark gray button background */
-    color: #fff;
-    /* White button text */
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 20px auto;
-    display: block;
-  }
-
-  button:hover {
-    background-color: #777;
-    /* Darker gray button hover background */
-  }
-
-  button:active {
-    background-color: #888;
-    /* Darker gray button active background */
-  }
-</style>
-<table>
-  <tr>
-    <th>Book ID</th>
-    <th>Title</th>
-    <th>Borrowed Date</th>
-    <th>Returned Date</th>
-  </tr>
-  <% borrowingHistory.forEach(function(history) { %>
-  <tr>
-    <td>
-      <%= history.book_id %>
-    </td>
-    <td>
-      <%= history.title %>
-    </td>
-    <td>
-      <%= history.borrowed_date %>
-    </td>
-    <td>
-      <%= history.returned_date %>
-    </td>
-  </tr>
-  <% }); %>
-</table>
-<button onclick="window.location.href='/books'">Back to Catalog</button>
+<body>
+  <table>
+    <tr>
+      <th>Book ID</th>
+      <th>Title</th>
+      <th>Borrowed Date</th>
+      <th>Returned Date</th>
+    </tr>
+    <% borrowingHistory.forEach(function(history) { %>
+    <tr>
+      <td>
+        <%= history.book_id %>
+      </td>
+      <td>
+        <%= history.title %>
+      </td>
+      <td>
+        <%= history.borrowed_date %>
+      </td>
+      <td>
+        <%= history.returned_date %>
+      </td>
+    </tr>
+    <% }); %>
+  </table>
+  <button onclick="window.location.href='/books'">Back to Catalog</button>
+</body>

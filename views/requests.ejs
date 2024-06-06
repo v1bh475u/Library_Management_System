@@ -5,82 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Requests</title>
-  <style>
-    /* Global styles */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #000;
-      color: #fff;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-
-    /* Table styles */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1rem auto;
-    }
-
-    th,
-    td {
-      border: 1px solid #ddd;
-      padding: .5rem;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f0f0f0;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
-    /* Select dropdown styles */
-    select {
-      width: 100%;
-      padding: .5rem;
-      border: 1px solid #ccc;
-      border-radius: .25rem;
-    }
-
-    /* Button styles */
-    button {
-      background-color: #4CAF50;
-      color: #fff;
-      padding: .5rem 1rem;
-      border: none;
-      border-radius: .25rem;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #3e8e41;
-    }
-
-    button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-
-    /* Apply changes button styles */
-    #apply-changes {
-      background-color: #8bc34a;
-      color: #fff;
-      padding: .5rem 1rem;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    #apply-changes:hover {
-      background-color: #689f38;
-    }
-  </style>
+  <link rel="stylesheet" href="/css/requests.css">
 </head>
 
 <body>
@@ -129,27 +54,6 @@
   <button id="apply-changes">Apply Changes</button>
   <button onclick="window.location.href='/books'">Back</button>
 </body>
-<script>
-  let requests = {};
-  document.getElementById('apply-changes').addEventListener('click', function() {
-    let status = document.querySelectorAll('.status');
-    status.forEach(function(select) {
-      const requestId = select.name;
-      const newStatus = select.value;
-      requests[requestId] = newStatus;
-    });
-    fetch('/apply-changes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        requests
-      })
-    })
-
-    window.location.href = '/requests';
-  });
-</script>
+<script src="/js/requests.js"></script>
 
 </html>

@@ -1,65 +1,22 @@
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #333;
-  }
+<html lang="en">
 
-  h1,
-  h2 {
-    text-align: center;
-    margin-top: 2rem;
-  }
+<head>
+  <title>Book Details</title>
+  <link rel="stylesheet" type="text/css" href="/css/BookDetails.css">
+</head>
 
-  p {
-    text-align: center;
-  }
-
-  button {
-    display: block;
-    margin: 0 auto;
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    border-width: 0;
-  }
-
-  button:hover {
-    background-color: #ddd;
-    cursor: pointer;
-  }
-
-  #history {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 2rem;
-    height: 10rem;
-  }
-
-  #history div {
-    border: .1rem solid #ddd;
-    padding: .5rem;
-    margin: .5rem;
-    width: 50%;
-  }
-
-  #history div p {
-    margin: 0;
-  }
-</style>
-<h1>
-  <%= book.title %>
-</h1>
-<p>Author: <%= book.author %>
-</p>
-<p>Genre: <%= book.genre %>
-</p>
-<p>Quantity Available:<%=book.quantity%></p>
-<!--<% /* %> <p>Summary: <%= book.summary %>
+<body>
+  <h1>
+    <%= book.title %>
+  </h1>
+  <p>Author: <%= book.author %>
+  </p>
+  <p>Genre: <%= book.genre %>
+  </p>
+  <p>Quantity Available:<%=book.quantity%></p>
+  <!--<% /* %> <p>Summary: <%= book.summary %>
 </p> -->
-<!-- <p>Pages: <%= book.pages %>
+  <!-- <p>Pages: <%= book.pages %>
 </p>
 <p>Publisher: <%= book.publisher %>
 </p>
@@ -68,64 +25,31 @@
 </p> -->
 
 
-<% if (book.status==='available'&&!isBorrower) { %>
-<button onclick="checkoutBook(`<%= book.id %>`,`<%=book.title%>`)">Checkout</button>
-<% } else { %>
-<% if (isBorrower) { %>
-<button onclick="checkinBook(`<%= book.id %>`,`<%=book.title%>`)">Checkin</button>
-<% }%>
-<% } %>
+  <% if (book.status==='available'&&!isBorrower) { %>
+  <button onclick="checkoutBook(`<%= book.id %>`,`<%=book.title%>`,`<%=user.username%>`)">Checkout</button>
+  <% } else { %>
+  <% if (isBorrower) { %>
+  <button onclick="checkinBook(`<%= book.id %>`,`<%=book.title%>`,`<%=user.username%>`)">Checkin</button>
+  <% }%>
+  <% } %>
 
 
-<h2>Borrowing History</h2>
-<div id="history">
-  <% history.forEach(function(history) { %>
-  <div>
-    <p>Borrowed by <%= history.borrower %>
-    </p>
-    <p>Borrowed on <%= history.borrowed_date %></p>
-    <% if (history.returned_date) { %>
-    <p>Returned on <%= history.returned_date %>
-    </p>
-    <% } %>
+  <h2>Borrowing History</h2>
+  <div id="history">
+    <% history.forEach(function(history) { %>
+    <div>
+      <p>Borrowed by <%= history.borrower %>
+      </p>
+      <p>Borrowed on <%= history.borrowed_date %></p>
+      <% if (history.returned_date) { %>
+      <p>Returned on <%= history.returned_date %>
+      </p>
+      <% } %>
+    </div>
+    <% }); %>
   </div>
-  <% }); %>
-</div>
-<button onclick="window.location.href='/books'">Back to Catalog</button>
-<script>
-  function checkoutBook(bookId, title) {
-    let date = new Date();
-    fetch('/checkout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        bookId: bookId,
-        borrower: '<%=user.username%>',
-        title: title,
-        date: date.toISOString().slice(0, 19).replace('T', ' ')
-      })
-    })
+  <button onclick="window.location.href='/books'">Back to Catalog</button>
+</body>
+<script src="/js/BookDetails.js"></script>
 
-    window.location.href = `/books`;
-  }
-
-  function checkinBook(bookId, title) {
-    let date = new Date();
-    fetch('/checkin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        bookId: bookId,
-        borrower: '<%= user.username %>',
-        title: title,
-        date: date.toISOString().slice(0, 19).replace('T', ' ')
-      })
-    })
-
-    window.location.href = `/books`;
-  }
-</script>
+</html

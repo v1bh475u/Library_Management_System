@@ -19,7 +19,7 @@ app.listen(port, () => {
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-app.use(express.static('./public'));
+app.use(express.static(__dirname + '/public'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 });
 
 app.use((req, res, next) => {
-    console.log(req.method + " request_ for " + req.originalUrl);
+    console.log(req.method + " request for " + req.originalUrl);
     next();
 });
 
@@ -88,6 +88,7 @@ app.get('/logout', authenticateUser, (req, res) => {
     res.clearCookie('token');
     res.redirect('/');
 });
+
 app.get('/books', authenticateUser, async (req, res) => {
     const query = `SELECT * FROM books`;
     const result = await runDBCommand(query);
@@ -102,7 +103,6 @@ app.post('/books', authenticateUser, async (req, res) => {
     const author = req.body.author;
     const token = req.headers.cookie.split('token=')[1];
     const user = await getUser(token);
-    console.log(genre, author);
     if (genre) {
         if (author) {
             const query = `SELECT * FROM books WHERE genre = ${mysql.escape(genre)} AND author = ${mysql.escape(author)}`;
@@ -128,7 +128,6 @@ app.post('/books', authenticateUser, async (req, res) => {
 app.post('/books/search', authenticateUser, async (req, res) => {
     const query = `SELECT * FROM books WHERE title LIKE '%${req.body.query}%'`;
     const result = await runDBCommand(query);
-    console.log(result);
     const token = req.headers.cookie.split('token=')[1];
     const user = await getUser(token);
     res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors });
@@ -194,6 +193,20 @@ app.get('/requests', authenticateUser, isAdmin, async (req, res) => {
     res.render('requests', { requests: result });
 });
 
+app.get('/add_book', authenticateUser, isAdmin, (req, res) => {
+    res.render('AddBook');
+});
+
+app.post('/add_book', authenticateUser, isAdmin, checkers.BookChecker, checkers.isBookPresent, async (req, res) => {
+    const title = req.body.title.trim();
+    const author = req.body.author.trim();
+    const genre = req.body.genre.trim();
+    const quantity = req.body.quantity.trim();
+    const query = `INSERT INTO books (title,author,genre,quantity,status) VALUES(${mysql.escape(title)},${mysql.escape(author)},${mysql.escape(genre)},${mysql.escape(quantity)},'available')`;
+    await runDBCommand(query);
+    res.redirect('/books');
+});
+
 app.get('/messages', authenticateUser, async (req, res) => {
     const token = req.headers.cookie.split('token=')[1];
     const user = await getUser(token);
@@ -206,7 +219,6 @@ app.get('/messages', authenticateUser, async (req, res) => {
 });
 
 app.post('/apply-changes', isAdmin, async (req, res) => {
-    console.log(req.body);
     for (let key in req.body.requests) {
         if (!checkers.idchecker(key)) {
             res.status(400).send("Thought you could fool me, huh? 😏");

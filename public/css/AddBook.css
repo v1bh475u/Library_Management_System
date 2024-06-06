@@ -1,0 +1,36 @@
+body {
+    background-color: #282c34;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+div {
+    width: 80vw;
+    margin: 5vw auto;
+    padding: 2vw;
+    background-color: #1f2228;
+    border-radius: 1vw;
+}
+
+input {
+    width: 100%;
+    padding: 2vh;
+    margin-bottom: 2vh;
+    border: none;
+    border-radius: 1vw;
+}
+
+button {
+    width: 100%;
+    padding: 2vh;
+    background-color: #61dafb;
+    color: #282c34;
+    font-size: 2.5vh;
+    border: none;
+    border-radius: 1vw;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #007bff;
+}

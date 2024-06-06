@@ -1,4 +1,19 @@
+<html lang="en">
+
+<head>
+  <title>Error</title>
+  <link rel="stylesheet" type="text/css" href="/css/error.css">
+</head>
+
 <body>
-  <p><%=message%></p>
+  <p><%=error%></p>
+  <script>
+    let img = document.createElement('img');
+    img.src = '/resources/trolls/' + '<%=message%>' + '.gif';
+    document.body.appendChild(img);
+  </script>
   <button onclick="window.location.href='/'">Back to Home</button>
 </body>
+
+
+</html>

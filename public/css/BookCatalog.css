@@ -1,0 +1,121 @@
+body {
+    background-image: linear-gradient(to bottom right, #380036, #0CBABA);
+    /* dark theme */
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: #fff;
+}
+
+nav {
+    background-color: #333;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    height: auto;
+    overflow: hidden;
+    z-index: 1;
+    padding-top: 1rem;
+    padding: auto;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0 1rem;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+nav ul li {
+    margin: 0 .5rem;
+}
+
+nav ul li a:hover {
+    /* background-color: #fff; */
+    color: #333;
+}
+
+nav form {
+    display: flex;
+    align-items: center;
+}
+
+nav form input[type="text"] {
+    margin: 0 .5rem;
+    padding: .5rem;
+    border: none;
+    border-radius: .5rem;
+    background-color: #444;
+    color: #fff;
+}
+
+nav form button[type="submit"] {
+    background-color: #555;
+    color: #fff;
+    border: none;
+    padding: 0.5rem;
+    border-radius: .5rem;
+    cursor: pointer;
+}
+
+nav form button[type="submit"]:hover {
+    background-color: #666;
+}
+
+nav form select {
+    margin: 0 .5rem;
+    padding: .5rem;
+    border: none;
+    border-radius: .5rem;
+    background-color: #444;
+    color: #fff;
+}
+
+#books {
+    display: flexbox;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    height: auto;
+    padding: 0;
+    margin: auto;
+}
+
+.book {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1%, solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(1rem);
+    -webkit-backdrop-filter: blur(1rem);
+    width: 80%;
+    height: fit-content;
+    padding: 1rem;
+    border-radius: 1rem;
+    color: #BEBEBE;
+    margin: 1rem;
+}
+
+.book h2,
+.book p {
+    margin: 0 0 10px 0;
+    color: #fff;
+}
+
+.book button {
+    background-color: #555;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: .5rem;
+    cursor: pointer;
+}
+
+.book button:hover {
+    background-color: #666;
+}
