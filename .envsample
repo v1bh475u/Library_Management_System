@@ -1,6 +1,6 @@
 DBHOST="localhost"
 DBUSER="root"
-DBPASSWORD="M@h@nt108"
+DBPASSWORD=""
 DATABASE="users_db" 
 PORT=8080
 SECRET_KEY="mysuperdupersecretkey"
