@@ -1,0 +1,6 @@
+<div id="messages"><%messages.forEach(function(message) { %>
+  <div class="message">
+    <p>Your request for <%= message.request %> has been <%= message.status %>!</p>
+  </div>
+  <% }); %>
+</div>

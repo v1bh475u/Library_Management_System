@@ -133,6 +133,7 @@
       <% } %>
       <li><a href='/login'>Logout(Not really)</a></li>
       <li><a href="/history">Borrowing History</a></li>
+      <li><a href="/messages">Messages</a></li>
       <li>
         <form action="/books/search" method="post" id="search-bar">
           <input type="text" name="query" placeholder="Search for books">
@@ -178,13 +179,7 @@
     <p>Genre: <%= book.genre %>
     </p>
     <% if (book.status==='available') { %>
-    <button onclick="checkoutBook('<%= book.id %>','<%=book.title%>')" class="checkout">Checkout</button>
-    <% } else if(book.status==='checkedout') { %>
-    <p>Borrowed by <% if(user.username!==book.borrower) {%><%= book.borrower %><% }else{ %>you<% } %>
-    </p>
-    <% if(book.borrower===user.username){%>
-    <button onclick="checkinBook('<%= book.id %>','<%=book.title%>')" class="checkin">Checkin</button>
-    <% } %>
+    <p>Available</p>
     <% } else{%>
     <p>Unavailable</p>
     <% } %>
@@ -194,41 +189,6 @@
 </div>
 
 <script>
-  function checkoutBook(bookId, title) {
-    let date = new Date();
-    fetch('/checkout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        bookId: bookId,
-        borrower: '<%=user.username%>',
-        title: title,
-        date: date.toISOString().slice(0, 19).replace('T', ' ')
-      })
-    })
-
-    window.location.href = '/books';
-  }
-
-  function checkinBook(bookId, title) {
-    let date = new Date();
-    fetch('/checkin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        bookId: bookId,
-        borrower: '<%= user.username %>',
-        title: title,
-        date: date.toISOString().slice(0, 19).replace('T', ' ')
-      })
-    })
-    window.location.href = '/books';
-  }
-
   function viewBookDetails(bookId) {
     window.location.href = `/books/${bookId}`;
   }
@@ -244,5 +204,8 @@
       })
     })
     window.location.href = `/books`;
+  }
+  if (n_message > 0) {
+    alert('You have' + String(n_message) + 'new messages');
   }
 </script>

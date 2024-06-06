@@ -56,6 +56,7 @@
 </p>
 <p>Genre: <%= book.genre %>
 </p>
+<p>Quantity Available:<%=book.quantity%></p>
 <!--<% /* %> <p>Summary: <%= book.summary %>
 </p> -->
 <!-- <p>Pages: <%= book.pages %>
@@ -67,14 +68,11 @@
 </p> -->
 
 
-<% if (book.status==='available') { %>
+<% if (book.status==='available'&&isBorrower.length===0) { %>
 <button onclick="checkoutBook('<%= book.id %>','<%=book.title%>')">Checkout</button>
 <% } else { %>
-<% if (book.borrower === user.username) { %>
+<% if (isBorrower.length>0) { %>
 <button onclick="checkinBook('<%= book.id %>','<%=book.title%>')">Checkin</button>
-<% } else if(book.status==='checkedout'){ %>
-<p>Borrowed by <%= book.borrower %>
-</p>
 <% }%>
 <% } %>
 
