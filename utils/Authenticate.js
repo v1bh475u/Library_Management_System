@@ -10,7 +10,12 @@ const authenticateUser = (req, res, next) => {
     try {
         const token = req.headers.cookie.split('token=')[1];
         if (jwt.verify(token, secretkey)) {
-            next();
+            const exp = jwt.decode(token, secretkey).exp;
+            if (Date.now() < exp * 1000) {
+                next();
+            } else {
+                return res.render("error", { message: "Unauthorized", error: "Token expired! 💀" });
+            }
         } else {
             return res.render("error", { message: "Unauthorized", error: "I see forgery!" });
         }

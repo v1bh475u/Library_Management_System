@@ -86,6 +86,7 @@ nav form select {
     height: auto;
     padding: 0;
     margin: auto;
+    margin-top: 3rem;
 }
 
 .book {

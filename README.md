@@ -42,3 +42,10 @@ Feedback System: User gets notified when his/her request is approved/rejected.
 - SQL injection is prevented by using prepared statements.
 - JWT tokens are used for authentication.
 - Authentication checks are in place for all routes.
+
+### Spam-proof! 
+Users can request for a book only once before the admin approves/rejects the request.
+
+Users can request for admin privileges only once before the admin approves/rejects the request.
+
+#### Default Admin: {username: admin, password: admin}

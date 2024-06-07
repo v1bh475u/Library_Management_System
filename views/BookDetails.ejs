@@ -3,7 +3,7 @@
 <head>
   <title>Book Details</title>
   <link rel="stylesheet" type="text/css" href="/css/BookDetails.css">
-  <link rel="icon" href="/resources/Favicon/open-book.png" type="image/x-icon">
+  <link rel="icon" href="/resources/Favicons/book.png" type="image/png">
 </head>
 
 <body>
@@ -27,13 +27,24 @@
 
 
   <% if (book.status==='available'&&!isBorrower) { %>
-  <button onclick="checkoutBook(`<%= book.id %>`,`<%=book.title%>`,`<%=user.username%>`)">Checkout</button>
+  <form action="/checkout" method="POST">
+    <input type="type" name="bookId" value="<%=book.id%>" hidden readonly>
+    <input type="type" name="title" value="<%=book.title%>" hidden readonly>
+    <input type="type" name="username" value="<%=user.username%>" hidden readonly>
+    <button type="submit">Checkout</button>
+  </form>
   <% } else { %>
   <% if (isBorrower) { %>
-  <button onclick="checkinBook(`<%= book.id %>`,`<%=book.title%>`,`<%=user.username%>`)">Checkin</button>
+  <form action="/checkin" method="POST">
+    <input type="type" name="bookId" value="<%=book.id%>" hidden readonly>
+    <input type="type" name="title" value="<%=book.title%>" hidden readonly>
+    <input type="type" name="username" value="<%=user.username%>" hidden readonly>
+    <button type="submit">Checkin</button>
+  </form>
   <% }%>
   <% } %>
 
+  <button onclick="window.location.href='/books'">Back to Catalog</button>
 
   <h2>Borrowing History</h2>
   <div id="history">
@@ -49,8 +60,6 @@
     </div>
     <% }); %>
   </div>
-  <button onclick="window.location.href='/books'">Back to Catalog</button>
 </body>
-<script src="/js/BookDetails.js"></script>
 
 </html

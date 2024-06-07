@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,55 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Requests</title>
   <link rel="stylesheet" href="/css/requests.css">
-  <link rel="icon" href="/resources/Favicon/book.png" type="image/x-icon">
+  <link rel="icon" href="/resources/Favicons/book.png" type="image/x-icon">
 </head>
 
 <body>
   <h1>Pending Requests</h1>
+  <div>
+    <form action="/apply-changes" method="POST">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Requester</th>
+            <th>Book ID</th>
+            <th>Book Title</th>
+            <th>Request Details</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% requests.forEach(function(request) { %>
+          <% if (request.status==='pending' ) { %>
+          <tr>
+            <td>
+              <%= request.id %>
+            </td>
+            <td>
+              <%= request.username %>
+            </td>
+            <td>
+              <%= request.book_id %>
+            </td>
+            <td><%=request.title%></td>
+            <td>
+              <%= request.request %>
+            </td>
+            <td>
+              <select name="<%= request.id %>" class="status">
+                <option value="pending" selected>Pending</option>
+                <option value="approved">Approved</option>
+                <option value="disapproved">Disapproved</option>
+              </select>
+            </td>
+          </tr>
+          <% }}); %>
+        </tbody>
+      </table>
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Requester</th>
-        <th>Book ID</th>
-        <th>Book Title</th>
-        <th>Request Details</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% requests.forEach(function(request) { %>
-      <% if (request.status==='pending' ) { %>
-      <tr>
-        <td>
-          <%= request.id %>
-        </td>
-        <td>
-          <%= request.username %>
-        </td>
-        <td>
-          <%= request.book_id %>
-        </td>
-        <td><%=request.title%></td>
-        <td>
-          <%= request.request %>
-        </td>
-        <td>
-          <select name="<%= request.id %>" class="status">
-            <option value="pending" selected>Pending</option>
-            <option value="approved">Approved</option>
-            <option value="disapproved">Disapproved</option>
-          </select>
-        </td>
-      </tr>
-      <% }}); %>
-    </tbody>
-  </table>
-
-  <button id="apply-changes">Apply Changes</button>
-  <button onclick="window.location.href='/books'">Back</button>
+      <button id="apply-changes" type="submit">Apply Changes</button>
+    </form>
+    <button onclick="window.location.href='/books'">Back</button>
+  </div>
 </body>
-<script src="/js/requests.js"></script>
 
 </html>

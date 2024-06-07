@@ -85,7 +85,7 @@ app.post('/register', validateRequestBody, async (req, res) => {
 });
 
 app.get('/logout', authenticateUser, (req, res) => {
-    res.clearCookie('token');
+    res.clearCookie('token', { httpOnly: true, secure: true, path: '/' });
     res.redirect('/');
 });
 
@@ -147,31 +147,29 @@ app.get('/books/:id', authenticateUser, async (req, res) => {
 
 app.post('/checkout', authenticateUser, checkers.checkout_check, checkers.isAdminRequested, async (req, res) => {
     const bookid = req.body.bookId;
-    const borrower = req.body.borrower;
+    const borrower = req.body.username;
     const title = req.body.title;
-    const date = req.body.date;
+    const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
     let query = `INSERT INTO requests (username,book_id,title,request,status,date,user_status) VALUES(${mysql.escape(borrower)},${mysql.escape(bookid)},${mysql.escape(title)},'checkout','pending',${mysql.escape(date)},'pending')`;
     await runDBCommand(query);
-    console.log("Request Sent");
-    res.redirect('/books');
+    res.render('error', { message: 'Request Sent', error: 'Request Sent' });
 
 });
 
 app.post('/checkin', authenticateUser, checkers.checkin_check, checkers.isAdminRequested, async (req, res) => {
     const bookid = req.body.bookId;
-    const borrower = req.body.borrower;
+    const borrower = req.body.username;
     const title = req.body.title;
-    const date = req.body.date;
+    const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
     let query = `INSERT INTO requests (username,book_id,title,request,status,date,user_status) VALUES(${mysql.escape(borrower)},${mysql.escape(bookid)},${mysql.escape(title)},'checkin','pending',${mysql.escape(date)},'pending')`;
     await runDBCommand(query);
-    console.log("Request Sent");
-    res.redirect('/books');
+    res.render('error', { message: 'Request Sent', error: 'Request Sent' });
 
 });
 
 app.post('/reqAdmin', authenticateUser, checkers.isAdminRequested, async (req, res) => {
     const username = req.body.username;
-    const date = req.body.date;
+    const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
     if (!checkers.nameChecker(username)) {
         res.status(400).send("User Not Found 😛");
         return;
@@ -196,8 +194,8 @@ app.get('/requests', authenticateUser, isAdmin, async (req, res) => {
     res.render('requests', { requests: result });
 });
 
-app.get('/add_book', authenticateUser, isAdmin, (req, res) => {
-    res.render('AddBook');
+app.get('/add-remove_book', authenticateUser, isAdmin, (req, res) => {
+    res.render('Add-RemoveBook');
 });
 
 app.post('/add_book', authenticateUser, isAdmin, checkers.BookChecker, checkers.isBookPresent, async (req, res) => {
@@ -206,6 +204,15 @@ app.post('/add_book', authenticateUser, isAdmin, checkers.BookChecker, checkers.
     const genre = req.body.genre.trim();
     const quantity = req.body.quantity.trim();
     const query = `INSERT INTO books (title,author,genre,quantity,status) VALUES(${mysql.escape(title)},${mysql.escape(author)},${mysql.escape(genre)},${mysql.escape(quantity)},'available')`;
+    await runDBCommand(query);
+    res.redirect('/books');
+});
+
+app.post('/remove_book', authenticateUser, isAdmin, checkers.isBook, async (req, res) => {
+    const title = req.body.title.trim();
+    const author = req.body.author.trim();
+    const genre = req.body.genre.trim();
+    const query = `DELETE FROM books WHERE title=${mysql.escape(title)} AND author=${mysql.escape(author)} AND genre=${mysql.escape(genre)}`;
     await runDBCommand(query);
     res.redirect('/books');
 });
@@ -222,22 +229,22 @@ app.get('/messages', authenticateUser, async (req, res) => {
 });
 
 app.post('/apply-changes', isAdmin, async (req, res) => {
-    for (let key in req.body.requests) {
+    for (let key in req.body) {
         if (!checkers.idchecker(key)) {
             res.status(400).send("Thought you could fool me, huh? 😏");
             return;
         }
-        if (!checkers.statusChecker(req.body.requests[key])) {
+        if (!checkers.statusChecker(req.body[key])) {
             res.status(400).send("Try again! 😏 Oops! But you will fail!");
             return;
         }
-        let query = `UPDATE requests SET status = ${mysql.escape(req.body.requests[key])} WHERE id = ${mysql.escape(key)}`;
-        if (req.body.requests[key] !== 'pending') {
-            query = `UPDATE requests SET status = ${mysql.escape(req.body.requests[key])}, user_status='unseen' WHERE id = ${mysql.escape(key)}`;
+        let query = `UPDATE requests SET status = ${mysql.escape(req.body[key])} WHERE id = ${mysql.escape(key)}`;
+        if (req.body[key] !== 'pending') {
+            query = `UPDATE requests SET status = ${mysql.escape(req.body[key])}, user_status='unseen' WHERE id = ${mysql.escape(key)}`;
         }
         await runDBCommand(query);
         const request = await runDBCommand(`SELECT * FROM requests WHERE id = ${key}`);
-        if (req.body.requests[key] === 'approved') {
+        if (req.body[key] === 'approved') {
             await requestExe(request[0]);
         }
     }
