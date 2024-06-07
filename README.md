@@ -23,3 +23,22 @@ npm start
 localhost:the_port_number_you_specified
 ```
 ## Features
+A user can:
+1. Request to checkin/checkout a book.
+2. Request for admin privileges.
+3. View his/her borrowing history.
+4. Search for books.
+5. View all books.
+
+An admin can do all the above and:
+1. Add a book.
+2. View all the requests made by users.
+3. Approve/Reject a user's request.
+
+Feedback System: User gets notified when his/her request is approved/rejected.
+
+## Security
+- Passwords are hashed and salted before storing in the database.
+- SQL injection is prevented by using prepared statements.
+- JWT tokens are used for authentication.
+- Authentication checks are in place for all routes.

@@ -98,7 +98,8 @@ const isAdminRequested = async (req, res, next) => {
         console.log(result.length);
         if (result.length > 0) {
             console.log('here');
-            return res.render('error', { message: 'SPAM', error: 'Request already present!' });
+            // return res.render('error', { message: 'SPAM', error: 'Request already present!' });
+            return res.redirect('/index');
         } else {
             next();
         }

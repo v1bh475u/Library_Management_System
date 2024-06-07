@@ -103,34 +103,36 @@ app.post('/books', authenticateUser, async (req, res) => {
     const author = req.body.author;
     const token = req.headers.cookie.split('token=')[1];
     const user = await getUser(token);
+    const n_messages = await checkers.messageChecker(user);
     if (genre) {
         if (author) {
             const query = `SELECT * FROM books WHERE genre = ${mysql.escape(genre)} AND author = ${mysql.escape(author)}`;
             const result = await runDBCommand(query);
-            res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors });
+            res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors, n_messages: n_messages.length });
         } else {
             const query = `SELECT * FROM books WHERE genre = ${mysql.escape(genre)}`;
             const result = await runDBCommand(query);
-            res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors });
+            res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors, n_messages: n_messages.length });
         }
     } else if (author) {
         const query = `SELECT * FROM books WHERE author = ${mysql.escape(author)}`;
         const result = await runDBCommand(query);
-        res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors });
+        res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors, n_messages: n_messages.length });
     } else {
         const query = `SELECT * FROM books`;
         const result = await runDBCommand(query);
-        res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors });
+        res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors, n_messages: n_messages.length });
 
     }
 });
 
 app.post('/books/search', authenticateUser, async (req, res) => {
-    const query = `SELECT * FROM books WHERE title LIKE '%${req.body.query}%'`;
+    const query = `SELECT * FROM books WHERE title LIKE ${mysql.escape('%' + req.body.query + '%')}`;
     const result = await runDBCommand(query);
     const token = req.headers.cookie.split('token=')[1];
     const user = await getUser(token);
-    res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors });
+    const n_messages = await checkers.messageChecker(user);
+    res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors, n_messages: n_messages.length });
 });
 
 app.get('/books/:id', authenticateUser, async (req, res) => {
