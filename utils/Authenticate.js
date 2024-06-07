@@ -30,10 +30,10 @@ const validateRequestBody = (req, res, next) => {
         if (req.body.password) {
             next();
         } else {
-            return res.status(400).send("Make sure you have entered the password! 😏");
+            return res.status(400).render("error", { message: "Not Allowed", error: "Password is missing!" });
         }
     } else {
-        return res.status(400).send("Make sure you have entered the username! 😏");
+        return res.status(400).render("error", { message: "Not Allowed", error: "Username is missing!" });
     }
 };
 
@@ -42,7 +42,7 @@ const isAdmin = async (req, res, next) => {
     if (jwt.decode(token, secretkey).role === 'admin') {
         next();
     } else {
-        return res.status(401).send("How dare you try to access this page! 😡");
+        return res.status(401).render("error", { message: "Unauthorized", error: "You are not an admin!" });
     }
 };
 

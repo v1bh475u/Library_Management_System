@@ -7,23 +7,32 @@
 </head>
 
 <body>
+  <nav>
+    <ul>
+      <li><a href="/requests">View Requests</a></li>
+      <li><a href="/books">BookCatalog</a></li>
+      <li><a href='/logout'>Logout</a></li>
+    </ul>
+  </nav>
   <div>
-    <form action="/add_book" method="post">
+    <form action="/add_book" method="post" id="add">
       <input type="text" name="title" id="title" required placeholder="Title">
       <input type="text" name="author" id="author" required placeholder="Author">
       <input type="text" name="genre" id="genre" required placeholder="Genre">
       <input type="text" name="quantity" id="quantity" required placeholder="Quantity">
       <button type="submit">Add Book</button>
+    </form>
   </div>
   <div>
-    <form action="/remove_book" method="post">
+    <form action="/remove_book" method="post" id="remove">
       <input type="text" name="title" id="title" required placeholder="Title">
       <input type="text" name="author" id="author" required placeholder="Author">
       <input type="text" name="genre" id="genre" required placeholder="Genre">
+      <input type="text" name="quantity" id="quantity" required placeholder="Quantity to be Removed">
+      <button type="submit">Remove Book</button>
     </form>
-    <button type="submit">Remove Book</button>
+    <p>If you want to delete a book entirely, give negative quantity!</p>
   </div>
-  <button onclick="window.location.href='/books'">Back to Catalog</button>
 </body>
 
 </html>

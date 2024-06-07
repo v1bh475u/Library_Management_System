@@ -15,7 +15,7 @@ CREATE TABLE `books`(
     `author` VARCHAR(255) NOT NULL,
     `genre` VARCHAR(255) NOT NULL,
     `status` ENUM('available','Unavailable') NOT NULL,
-    `quantity` INT NOT NULL
+    `quantity` INT
 );
 
 CREATE TABLE `requests`(

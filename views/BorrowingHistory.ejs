@@ -5,6 +5,52 @@
 </head>
 
 <body>
+  <nav>
+    <ul>
+      <% if (user.role==='admin') { %>
+      <li><a href="/requests">View Requests</a></li>
+      <li><a href="/add-remove_book">Add or Remove Book</a></li>
+      <% } else{%>
+      <li>
+        <form method="POST" action="/reqAdmin" id="AdminPrivs">
+          <input type="text" value="<%=user.username %>" name="username" hidden readonly>
+          <button type="submit">GetAdminPrivs</button>
+        </form>
+      </li>
+      <li><a href="/history">Borrowing History</a></li>
+      <li><a href="/messages" id="messages">Messages</a></li>
+      <% } %>
+      <li>
+        <form action="/books/search" method="post" id="search-bar">
+          <input type="text" name="query" placeholder="Search for books">
+          <button type="submit">Search</button>
+        </form>
+      </li>
+      <li>
+        <form action="/books" method="post" id="filter">
+          <label>Filter by:</label>
+          <select name="genre" id="genre-select">
+            <option value="">All Genres</option>
+            <% genres.forEach(function(genre) { %>
+            <option value="<%= genre %>">
+              <%= genre %>
+            </option>
+            <% }); %>
+          </select>
+          <select name="author" id="author-select">
+            <option value="">All Authors</option>
+            <% authors.forEach(function(author) { %>
+            <option value="<%= author %>">
+              <%= author %>
+            </option>
+            <% }); %>
+          </select>
+          <button type="submit">Filter</button>
+        </form>
+      </li>
+      <li><a href='/logout'>Logout</a></li>
+    </ul>
+  </nav>
   <table>
     <tr>
       <th>Book ID</th>

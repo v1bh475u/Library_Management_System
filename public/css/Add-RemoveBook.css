@@ -34,3 +34,73 @@ button {
 button:hover {
     background-color: #007bff;
 }
+
+a {
+    text-decoration: none;
+    color: #fff;
+}
+
+nav {
+    background-color: #333;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    height: auto;
+    overflow: hidden;
+    z-index: 1;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0 1rem;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+nav ul li {
+    margin: 0 .5rem;
+}
+
+nav ul li a:hover {
+    /* background-color: #fff; */
+    color: #6699CC;
+}
+
+nav form {
+    display: flex;
+    align-items: center;
+}
+
+nav form input[type="text"] {
+    margin: 0 .5rem;
+    padding: .5rem;
+    border: none;
+    border-radius: .5rem;
+    background-color: #444;
+    color: #fff;
+}
+
+nav form button[type="submit"] {
+    background-color: #555;
+    color: #fff;
+    border: none;
+    padding: 0.5rem;
+    border-radius: .5rem;
+    cursor: pointer;
+}
+
+nav form button[type="submit"]:hover {
+    background-color: #666;
+}
+
+nav form select {
+    margin: 0 .5rem;
+    padding: .5rem;
+    border: none;
+    border-radius: .5rem;
+    background-color: #444;
+    color: #fff;
+}

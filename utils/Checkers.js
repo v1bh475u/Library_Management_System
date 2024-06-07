@@ -1,8 +1,5 @@
-const { error } = require('console');
 const { runDBCommand } = require('./DBCommands.js');
 const mysql = require('mysql2');
-const e = require('express');
-const path = require('path');
 const statusChecker = (status) => {
     return status === 'pending' || status === 'approved' || status === 'disapproved' ? true : false;
 }
@@ -62,6 +59,7 @@ const messageChecker = async (user) => {
 }
 const BookChecker = async (req, res, next) => {
     const { title, author, genre, quantity } = req.body;
+    const nquantity = parseInt(quantity);
     if (!title) {
         return res.render('error', { message: 'Wrong Book', error: 'Title is not present!' });
     }
@@ -71,8 +69,10 @@ const BookChecker = async (req, res, next) => {
     else if (!genre) {
         return res.render('error', { message: 'Wrong Book', error: 'Genre is not present!' });
     }
-    else if (quantity < 1) {
-        return res.render('error', { message: 'Wrong Book', error: 'Quantity is not present!' });
+    else if (nquantity === NaN) {
+        return res.render('error', { message: 'Wrong Book', error: 'Quantity must be a number!' });
+    } else if (nquantity < 0) {
+        return res.render('error', { message: 'Wrong Book', error: 'Quantity must be a positive number!' });
     } else {
         next();
     }
@@ -122,4 +122,14 @@ const isAdminRequested = async (req, res, next) => {
     }
 }
 
-module.exports = { statusChecker, idchecker, nameChecker, messageChecker, checkin_check, checkout_check, BookChecker, isBookPresent, isAdminRequested, isBook };
+const BookStatus = async function (book, user) {
+    const isBorrowed = await runDBCommand(`SELECT * FROM borrowing_history WHERE book_id=${mysql.escape(book.id)} AND borrower=${mysql.escape(user.username)} AND returned_date IS NULL`);
+    if (isBorrowed.length > 0) {
+        return 'borrowed';
+    }
+    const isRequested = await runDBCommand(`SELECT * FROM requests WHERE book_id=${mysql.escape(book.id)} AND username=${mysql.escape(user.username)} AND status='pending'`);
+    if (isRequested.length > 0) {
+        return 'requested';
+    }
+}
+module.exports = { statusChecker, idchecker, nameChecker, messageChecker, checkin_check, checkout_check, BookChecker, isBookPresent, isAdminRequested, isBook, BookStatus };

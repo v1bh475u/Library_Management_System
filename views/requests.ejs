@@ -5,12 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Requests</title>
   <link rel="stylesheet" href="/css/requests.css">
-  <link rel="icon" href="/resources/Favicons/book.png" type="image/x-icon">
+  <link rel="icon" href="/resources/Favicons/book.png" type="image/png">
 </head>
 
 <body>
+  <nav>
+    <ul>
+      <li><a href="/add-remove_books">Add or Remove Books</a></li>
+      <li><a href="/books">BooksCatlog</a></li>
+      <li><a href='/logout'>Logout</a></li>
+    </ul>
+  </nav>
   <h1>Pending Requests</h1>
-  <div>
+  <div id="requests">
     <form action="/apply-changes" method="POST">
       <table>
         <thead>
@@ -51,10 +58,8 @@
           <% }}); %>
         </tbody>
       </table>
-
       <button id="apply-changes" type="submit">Apply Changes</button>
     </form>
-    <button onclick="window.location.href='/books'">Back</button>
   </div>
 </body>
 

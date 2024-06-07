@@ -20,10 +20,12 @@
             <button type="submit">GetAdminPrivs</button>
           </form>
         </li>
-        <% } %>
-        <li><a href='/logout'>Logout</a></li>
         <li><a href="/history">Borrowing History</a></li>
         <li><a href="/messages" id="messages">Messages</a></li>
+        <% } %>
+        <% if(back){ %>
+        <li><a href="/books">Back</a></li>
+        <% } %>
         <li>
           <form action="/books/search" method="post" id="search-bar">
             <input type="text" name="query" placeholder="Search for books">
@@ -49,14 +51,19 @@
               </option>
               <% }); %>
             </select>
+            <select name="user_status">
+              <option value="">All Books</option>
+              <option value="borrowed">Borrowed</option>
+              <option value="available">Available</option>
+            </select>
             <button type="submit">Filter</button>
           </form>
-
         </li>
+        <li><a href='/logout'>Logout</a></li>
       </ul>
     </nav>
   </header>
-  <% if(n_messages>0){ %>
+  <% if(n_messages>0&&user.role!=='admin'){ %>
   <script>
     var n_messages = <%= n_messages %>;
     alert('You have ' + String(n_messages) + ' new messages');
@@ -67,6 +74,7 @@
   <h1>Book Catalog</h1>
   <div id="books">
     <% books.forEach(function(book) { %>
+    <% if(book.quantity>=0){ %>
     <div class="book">
       <h2>
         <%= book.title %>
@@ -75,6 +83,9 @@
       </p>
       <p>Genre: <%= book.genre %>
       </p>
+      <p>
+        <%= book.user_status %>
+      </p>
       <% if (book.status==='available') { %>
       <p>Available</p>
       <% } else{%>
@@ -82,6 +93,7 @@
       <% } %>
       <button onclick=" viewBookDetails('<%= book.id %>')">View Details</button>
     </div>
+    <% } %>
     <% }); %>
   </div>
 </body>

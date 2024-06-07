@@ -21,6 +21,9 @@
         <input type="password" id="signupPassword" name="password" required placeholder="Password">
       </div>
       <button type="submit">Register</button>
+      <% if(message) { %>
+      <p class="message"><%= message %></p>
+      <% } %>
       <p class="message">Already registered? <a href="/login" id="showLogin">Sign in</a></p>
     </form>
   </div>
