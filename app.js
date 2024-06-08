@@ -24,7 +24,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-    return res.render('index');
+    const cookie = req.headers.cookie;
+    if (!cookie) {
+        return res.render('index');
+    }
+    const token = cookie.split('token=')[1];
+    if (token) {
+        return res.redirect('/books');
+    } else {
+        return res.render('index');
+    }
 });
 
 app.use((req, res, next) => {
