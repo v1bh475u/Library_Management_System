@@ -15,7 +15,8 @@
   <p>Genre: <%= book.genre %>
   </p>
   <p>Quantity Available:<%=book.quantity%></p>
-
+  <% if(user.role==='user') {%>
+  <% if(book.user_status!=='requested'){ %>
   <% if (book.status==='available'&&!isBorrower) { %>
   <form action="/checkout" method="POST">
     <input type="type" name="bookId" value="<%=book.id%>" hidden readonly>
@@ -33,7 +34,8 @@
   </form>
   <% }%>
   <% } %>
-
+  <% } %>
+  <% } %>
   <button onclick="window.location.href='/books'">Back to Catalog</button>
 
   <h2>Borrowing History</h2>

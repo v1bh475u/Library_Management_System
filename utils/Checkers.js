@@ -91,9 +91,7 @@ const isBookPresent = async (req, res, next) => {
 };
 const isBook = async (req, res, next) => {
     const title = req.body.title.trim();
-    const author = req.body.author.trim();
-    const genre = req.body.genre.trim();
-    const result = await runDBCommand(`SELECT * FROM books WHERE title=${mysql.escape(title)} AND author=${mysql.escape(author)} AND genre=${mysql.escape(genre)}`);
+    const result = await runDBCommand(`SELECT * FROM books WHERE title=${mysql.escape(title)}`);
     if (result.length > 0) {
         next();
     } else {
@@ -115,6 +113,7 @@ const isAdminRequested = async (req, res, next) => {
     } else {
         const result = await runDBCommand(`SELECT * FROM requests WHERE username=${mysql.escape(username)} AND book_id=${mysql.escape(book_id)} AND status='pending'`);
         if (result.length > 0) {
+            res.clearCookie('token', { httpOnly: true, secure: true, path: '/' });
             return res.render('error', { message: 'SPAM', error: 'Request already present!' });
         } else {
             next();
@@ -131,5 +130,16 @@ const BookStatus = async function (book, user) {
     if (isRequested.length > 0) {
         return 'requested';
     }
-}
-module.exports = { statusChecker, idchecker, nameChecker, messageChecker, checkin_check, checkout_check, BookChecker, isBookPresent, isAdminRequested, isBook, BookStatus };
+};
+const isPending = async (req, res, next) => {
+    const { title, quantity } = req.body;
+    const result = await runDBCommand(`SELECT * FROM requests WHERE title=${mysql.escape(title)} AND status='pending'`);
+    const nquantity = parseInt(quantity);
+    const actual_quantity = parseInt((await runDBCommand(`SELECT quantity FROM books WHERE title=${mysql.escape(title)}`))[0].quantity);
+    if (result.length > actual_quantity - nquantity) {
+        return res.render('error', { message: 'Wrong Book', error: 'You have pending requests for the book!' });
+    } else {
+        next();
+    }
+};
+module.exports = { statusChecker, idchecker, nameChecker, messageChecker, checkin_check, checkout_check, BookChecker, isBookPresent, isAdminRequested, isBook, BookStatus, isPending };

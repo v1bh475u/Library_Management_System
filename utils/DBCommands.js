@@ -43,4 +43,16 @@ const requestExe = async (request) => {
             break;
     }
 };
-module.exports = { runDBCommand, requestExe };
+const getgenres = async () => {
+    const query = `SELECT genre FROM books GROUP BY genre`;
+    const result = await runDBCommand(query);
+    return result;
+};
+
+const getauthors = async () => {
+    const query = `SELECT author FROM books GROUP BY author`;
+    const result = await runDBCommand(query);
+    return result;
+};
+
+module.exports = { runDBCommand, requestExe, getgenres, getauthors };

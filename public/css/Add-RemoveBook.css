@@ -5,27 +5,36 @@ body {
 }
 
 div {
-    width: 80vw;
+    width: 80%;
     margin: 5vw auto;
     padding: 2vw;
     background-color: #1f2228;
     border-radius: 1vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 input {
-    width: 100%;
+    width: 80%;
     padding: 2vh;
-    margin-bottom: 2vh;
+    margin: 1rem;
     border: none;
     border-radius: 1vw;
 }
 
 button {
-    width: 100%;
+    width: 10%;
     padding: 2vh;
     background-color: #61dafb;
     color: #282c34;
-    font-size: 2.5vh;
+    font-size: 1rem;
     border: none;
     border-radius: 1vw;
     cursor: pointer;
@@ -103,4 +112,26 @@ nav form select {
     border-radius: .5rem;
     background-color: #444;
     color: #fff;
+}
+
+select {
+    padding: 0.625em;
+    font-size: 1em;
+    border: 0.0625em solid #aaa;
+    border-radius: 0.25em;
+    appearance: none;
+    /* This removes the default browser styling */
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+    width: 80%;
+}
+
+select:hover {
+    border-color: #888;
+}
+
+select:focus {
+    outline: none;
+    border-color: #007BFF;
 }

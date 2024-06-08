@@ -38,23 +38,23 @@
             <select name="genre" id="genre-select">
               <option value="">All Genres</option>
               <% genres.forEach(function(genre) { %>
-              <option value="<%= genre %>">
-                <%= genre %>
+              <option value="<%= genre.genre %>">
+                <%= genre.genre %>
               </option>
               <% }); %>
             </select>
             <select name="author" id="author-select">
               <option value="">All Authors</option>
               <% authors.forEach(function(author) { %>
-              <option value="<%= author %>">
-                <%= author %>
+              <option value="<%= author.author %>">
+                <%= author.author %>
               </option>
               <% }); %>
             </select>
             <select name="user_status">
               <option value="">All Books</option>
               <option value="borrowed">Borrowed</option>
-              <option value="available">Available</option>
+              <option value="requested">Requested</option>
             </select>
             <button type="submit">Filter</button>
           </form>

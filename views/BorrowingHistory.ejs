@@ -11,69 +11,37 @@
       <li><a href="/requests">View Requests</a></li>
       <li><a href="/add-remove_book">Add or Remove Book</a></li>
       <% } else{%>
-      <li>
-        <form method="POST" action="/reqAdmin" id="AdminPrivs">
-          <input type="text" value="<%=user.username %>" name="username" hidden readonly>
-          <button type="submit">GetAdminPrivs</button>
-        </form>
-      </li>
-      <li><a href="/history">Borrowing History</a></li>
+      <li><a href="/books">Back</a></li>
       <li><a href="/messages" id="messages">Messages</a></li>
       <% } %>
-      <li>
-        <form action="/books/search" method="post" id="search-bar">
-          <input type="text" name="query" placeholder="Search for books">
-          <button type="submit">Search</button>
-        </form>
-      </li>
-      <li>
-        <form action="/books" method="post" id="filter">
-          <label>Filter by:</label>
-          <select name="genre" id="genre-select">
-            <option value="">All Genres</option>
-            <% genres.forEach(function(genre) { %>
-            <option value="<%= genre %>">
-              <%= genre %>
-            </option>
-            <% }); %>
-          </select>
-          <select name="author" id="author-select">
-            <option value="">All Authors</option>
-            <% authors.forEach(function(author) { %>
-            <option value="<%= author %>">
-              <%= author %>
-            </option>
-            <% }); %>
-          </select>
-          <button type="submit">Filter</button>
-        </form>
-      </li>
       <li><a href='/logout'>Logout</a></li>
     </ul>
   </nav>
-  <table>
-    <tr>
-      <th>Book ID</th>
-      <th>Title</th>
-      <th>Borrowed Date</th>
-      <th>Returned Date</th>
-    </tr>
-    <% borrowingHistory.forEach(function(history) { %>
-    <tr>
-      <td>
-        <%= history.book_id %>
-      </td>
-      <td>
-        <%= history.title %>
-      </td>
-      <td>
-        <%= history.borrowed_date %>
-      </td>
-      <td>
-        <%= history.returned_date %>
-      </td>
-    </tr>
-    <% }); %>
-  </table>
-  <button onclick="window.location.href='/books'">Back to Catalog</button>
+  <div class="container">
+    <h1>Borrowing History</h1>
+    <table>
+      <tr>
+        <th>Book ID</th>
+        <th>Title</th>
+        <th>Borrowed Date</th>
+        <th>Returned Date</th>
+      </tr>
+      <% borrowingHistory.forEach(function(history) { %>
+      <tr>
+        <td>
+          <%= history.book_id %>
+        </td>
+        <td>
+          <%= history.title %>
+        </td>
+        <td>
+          <%=history.borrowed_date%>
+        </td>
+        <td>
+          <%= history.returned_date %>
+        </td>
+      </tr>
+      <% }); %>
+    </table>
+  </div>
 </body>

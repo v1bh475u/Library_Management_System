@@ -5,14 +5,13 @@ var path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const checkers = require('./utils/Checkers.js')
-const { runDBCommand, requestExe } = require('./utils/DBCommands.js');
+const { DatePrettifier } = require('./utils/prettifier.js');
+const { runDBCommand, requestExe, getgenres, getauthors } = require('./utils/DBCommands.js');
 const { authenticateUser, validateRequestBody, isAdmin, getUser, HashPassword } = require('./utils/Authenticate.js');
 const port = process.env.PORT;
 const secretkey = process.env.SECRET_KEY;
 const app = express();
 
-const genres = ['Fiction', 'Non-Fiction', 'Science Fiction', 'Fantasy', 'Mystery', 'Thriller', 'Romance', 'Horror', 'Biography', 'Autobiography', 'Self-Help', 'Cookbook', 'Travel', 'History', 'Science', 'Art', 'Poetry', 'Drama', 'Religion', 'Philosophy', 'Children', 'Young Adult', 'Comics', 'Graphic Novel', 'Manga', 'Textbook', 'Reference', 'Encyclopedia', 'Dictionary', 'Thesaurus', 'Atlas', 'Almanac', 'Periodical', 'Magazine', 'Newspaper', 'Journal', 'Newsletter', 'Brochure', 'Pamphlet', 'Flyer', 'Poster', 'Billboard', 'Banner', 'Postcard', 'Business Card', 'Letterhead', 'Envelope', 'Invoice', 'Memo', 'Agenda', 'Calendar', 'Planner', 'Diary', 'Journal', 'Notebook', 'Notepad', 'Sketchbook', 'Address Book', 'Contact List', 'Directory', 'Catalog', 'Manual', 'Guide', 'Handbook', 'Tutorial', 'Workbook', 'Textbook', 'Reference', 'Encyclopedia', 'Dictionary', 'Thesaurus', 'Atlas', 'Almanac', 'Periodical', 'Magazine', 'Newspaper', 'Journal', 'Newsletter', 'Brochure', 'Pamphlet', 'Flyer', 'Poster', 'Billboard', 'Banner', 'Postcard', 'Business Card', 'Letterhead', 'Envelope', 'Invoice', 'Memo', 'Agenda', 'Calendar', 'Planner', 'Diary', 'Journal', 'Notebook', 'Notepad', 'Sketchbook', 'Address Book', 'Contact List', 'Directory', 'Catalog', 'Manual', 'Guide', 'Handbook', 'Tutorial', 'Workbook'];
-const authors = ['Agatha Christie', 'William Shakespeare', 'Arthur Conan Doyle'];
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
@@ -87,14 +86,16 @@ app.get('/logout', authenticateUser, (req, res) => {
 
 app.get('/books', authenticateUser, async (req, res) => {
     const query = `SELECT * FROM books`;
-    let books = await runDBCommand(query);
     const token = req.headers.cookie.split('token=')[1];
     const user = await getUser(token);
+    let books = await runDBCommand(query);
     books = await Promise.all((books).map(async (book) => {
         const user_status = await checkers.BookStatus(book, user);
         return { ...book, user_status };
     }));
     const n_messages = await checkers.messageChecker(user);
+    const genres = await getgenres();
+    const authors = await getauthors();
     return res.render('BookCatalog', { books: books, user: user, genres: genres, authors: authors, n_messages: n_messages.length, back: false });
 });
 
@@ -105,6 +106,8 @@ app.post('/books', authenticateUser, async (req, res) => {
     const token = req.headers.cookie.split('token=')[1];
     const user = await getUser(token);
     const n_messages = await checkers.messageChecker(user);
+    const genres = await getgenres();
+    const authors = await getauthors();
     if (genre) {
         if (author) {
             const query = `SELECT * FROM books WHERE genre = ${mysql.escape(genre)} AND author = ${mysql.escape(author)}`;
@@ -117,6 +120,7 @@ app.post('/books', authenticateUser, async (req, res) => {
                 }));
                 result = books.filter((book) => book.user_status === user_status);
             }
+
             return res.render('BookCatalog', { books: result, user: user, genres: genres, authors: authors, n_messages: n_messages.length, back: true });
         } else {
             const query = `SELECT * FROM books WHERE genre = ${mysql.escape(genre)}`;
@@ -165,12 +169,22 @@ app.post('/books/search', authenticateUser, async (req, res) => {
 
 app.get('/books/:id', authenticateUser, async (req, res) => {
     const query = `SELECT * FROM books WHERE id = ${mysql.escape(req.params.id)}`;
-    const result = await runDBCommand(query);
     const token = req.headers.cookie.split('token=')[1];
     const user = await getUser(token);
-    const history = await runDBCommand(`SELECT * FROM borrowing_history WHERE book_id=${mysql.escape(req.params.id)}`);
+    let books = await runDBCommand(query);
+    books = await Promise.all((books).map(async (book) => {
+        const user_status = await checkers.BookStatus(book, user);
+        return { ...book, user_status };
+    }));
+    let history = await runDBCommand(`SELECT * FROM borrowing_history WHERE book_id=${mysql.escape(req.params.id)}`);
+    for (let h of history) {
+        h.borrowed_date = await DatePrettifier(h.borrowed_date);
+        if (h.returned_date) {
+            h.returned_date = await DatePrettifier(h.returned_date);
+        }
+    }
     const isBorrower = history.filter((h) => h.borrower === user.username && h.returned_date === null).length > 0;
-    return res.render('BookDetails', { book: result[0], user: user, history: history, isBorrower: isBorrower });
+    return res.render('BookDetails', { book: books[0], user: user, history: history, isBorrower: isBorrower, DatePrettifier });
 });
 
 app.post('/checkout', authenticateUser, checkers.checkout_check, checkers.isAdminRequested, async (req, res) => {
@@ -204,7 +218,6 @@ app.post('/reqAdmin', authenticateUser, checkers.isAdminRequested, async (req, r
     }
     const query = `INSERT INTO requests (username,request,status,user_status,date) VALUES(${mysql.escape(username)},'adminPrivs','pending','pending',${mysql.escape(date)})`;
     await runDBCommand(query);
-    console.log("Request Sent");
     return res.render('error', { message: 'Request Sent', error: 'Request Sent' });
 });
 
@@ -212,8 +225,14 @@ app.get('/history', authenticateUser, async (req, res) => {
     const token = req.headers.cookie.split('token=')[1];
     const user = await getUser(token);
     const query = `SELECT * FROM borrowing_history WHERE borrower = ${mysql.escape(user.username)}`;
-    const result = await runDBCommand(query);
-    return res.render('BorrowingHistory', { borrowingHistory: result });
+    let result = await runDBCommand(query);
+    for (let h of result) {
+        h.borrowed_date = await DatePrettifier(h.borrowed_date);
+        if (h.returned_date) {
+            h.returned_date = await DatePrettifier(h.returned_date);
+        }
+    }
+    return res.render('BorrowingHistory', { borrowingHistory: result, user: user });
 });
 
 app.get('/requests', authenticateUser, isAdmin, async (req, res) => {
@@ -222,8 +241,9 @@ app.get('/requests', authenticateUser, isAdmin, async (req, res) => {
     return res.render('requests', { requests: result });
 });
 
-app.get('/add-remove_book', authenticateUser, isAdmin, (req, res) => {
-    return res.render('Add-RemoveBook');
+app.get('/add-remove_book', authenticateUser, isAdmin, async (req, res) => {
+    const books = await runDBCommand(`SELECT * FROM books`);
+    return res.render('Add-RemoveBook', { books: books });
 });
 
 app.post('/add_book', authenticateUser, isAdmin, checkers.BookChecker, checkers.isBookPresent, async (req, res) => {
@@ -236,22 +256,36 @@ app.post('/add_book', authenticateUser, isAdmin, checkers.BookChecker, checkers.
     res.redirect('/books');
 });
 
-app.post('/remove_book', authenticateUser, isAdmin, checkers.isBook, async (req, res) => {
+app.post('/remove_book', authenticateUser, isAdmin, checkers.isBook, checkers.isPending, async (req, res) => {
     const title = req.body.title.trim();
-    const author = req.body.author.trim();
-    const genre = req.body.genre.trim();
     const quantity = req.body.quantity.trim();
     if (quantity < 0) {
-        const query = `UPDATE books SET quantity=${mysql.escape('-1')} WHERE title=${mysql.escape(title)} AND author=${mysql.escape(author)} AND genre=${mysql.escape(genre)}`;
+        const query = `UPDATE books SET quantity=${mysql.escape('-1')} WHERE title=${mysql.escape(title)}`;
         await runDBCommand(query);
     } else {
-        let result = await runDBCommand(`SELECT * FROM books WHERE title=${mysql.escape(title)} AND author=${mysql.escape(author)} AND genre=${mysql.escape(genre)}`);
+        let result = await runDBCommand(`SELECT * FROM books WHERE title=${mysql.escape(title)}`);
         if (result[0].quantity < quantity) {
             return res.render('error', { message: 'Not Allowed', error: 'Quantity cannot be removed.' });
         }
-        const query = `UPDATE books SET quantity=quantity-${mysql.escape(quantity)} WHERE title=${mysql.escape(title)} AND author=${mysql.escape(author)} AND genre=${mysql.escape(genre)}`;
+        const query = `UPDATE books SET quantity=quantity-${mysql.escape(quantity)} WHERE title=${mysql.escape(title)}`;
         await runDBCommand(query);
+        const check = await runDBCommand(`SELECT * FROM books WHERE title=${mysql.escape(title)}`);
+        if (check[0].quantity === 0) {
+            await runDBCommand(`UPDATE books SET status='Unavailable' WHERE title=${mysql.escape(title)}`);
+        }
     }
+    res.redirect('/books');
+});
+
+app.post('/update_book', authenticateUser, isAdmin, checkers.isBook, async (req, res) => {
+    const title = req.body.title.trim();
+    const quantity = req.body.quantity.trim();
+    if (quantity < 0) {
+        return res.render('error', { message: 'Not Allowed', error: 'Quantity cannot be negative!' });
+    }
+    const query = `UPDATE books SET quantity=quantity+${mysql.escape(quantity)} WHERE title=${mysql.escape(title)}`;
+    await runDBCommand(query);
+    const check = await runDBCommand(`SELECT * FROM books WHERE title=${mysql.escape(title)}`);
     res.redirect('/books');
 });
 

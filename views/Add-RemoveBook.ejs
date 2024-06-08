@@ -25,13 +25,28 @@
   </div>
   <div>
     <form action="/remove_book" method="post" id="remove">
-      <input type="text" name="title" id="title" required placeholder="Title">
-      <input type="text" name="author" id="author" required placeholder="Author">
-      <input type="text" name="genre" id="genre" required placeholder="Genre">
+      <select name="title" id="title" required>
+        <option value="" disabled selected>Select Book</option>
+        <% books.forEach(function(book) { %>
+        <option value="<%= book.title %>"><%= book.title %></option>
+        <% }); %>
+      </select>
       <input type="text" name="quantity" id="quantity" required placeholder="Quantity to be Removed">
       <button type="submit">Remove Book</button>
     </form>
     <p>If you want to delete a book entirely, give negative quantity!</p>
+  </div>
+  <div>
+    <form action="/update_book" method="post" id="update">
+      <select name="title" id="title" required>
+        <option value="" disabled selected>Select Book</option>
+        <% books.forEach(function(book) { %>
+        <option value="<%= book.title %>"><%= book.title %></option>
+        <% }); %>
+      </select>
+      <input type="text" name="quantity" id="quantity" required placeholder="Quantity to be Added">
+      <button type="submit">Update Book</button>
+    </form>
   </div>
 </body>
 
